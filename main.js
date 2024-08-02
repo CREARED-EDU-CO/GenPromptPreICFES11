@@ -1,7 +1,7 @@
 /*
- * Este archivo es parte del proyecto MiAplicacion.
+ * Este archivo es parte del proyecto GenPromptPreICFES11.
  *
- * Copyright (C) 2024 Juan Pérez
+ * Copyright (C) 2024 CREARED.EDU.CO
  *
  * Este programa es software libre: puedes redistribuirlo y/o modificarlo 
  * bajo los términos de la Licencia Pública General Affero de GNU publicada 
