@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Prompts para el ICFES SABER 11</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Contenedor principal del formulario -->
+    <div class="contenedor">
+        <form id="formularioPrompt">
+            <!-- Selector de materia -->
+            <div>
+                <label for="materia">Materia:</label>
+                <select id="materia">
+                    <option value="">Selecciona una materia</option>
+                    <option value="LECTURA CRÍTICA">LECTURA CRÍTICA</option>
+                    <option value="MATEMÁTICAS">MATEMÁTICAS</option>
+                    <option value="FÍSICA">FÍSICA</option>
+                    <option value="QUÍMICA">QUÍMICA</option>
+                    <option value="BIOLOGÍA">BIOLOGÍA</option>
+                    <option value="GEOGRAFÍA">GEOGRAFÍA</option>
+                    <option value="HISTORIA">HISTORIA</option>
+                    <option value="COMPETENCIAS CIUDADANAS">COMPETENCIAS CIUDADANAS</option>
+                    <option value="INGLÉS">INGLÉS</option>
+                </select>
+            </div>
+            <!-- Selector de tema principal -->
+            <div>
+                <label for="temaPrincipal">Tema principal:</label>
+                <select id="temaPrincipal">
+                    <option value="">Primero selecciona una materia</option>
+                </select>
+            </div>
+            <!-- Selector de subtema -->
+            <div>
+                <label for="subtema">Subtema:</label>
+                <select id="subtema">
+                    <option value="">Primero selecciona un tema principal</option>
+                </select>
+            </div>
+            <!-- Selector de nivel de competencia y habilidad -->
+            <div>
+                <label for="nivelDificultad">Nivel de competencia:</label>
+                <select id="nivelDificultad">
+                    <option value="">Selecciona un nivel</option>
+                    <option value="BÁSICO (Solo Nivel 1)">BÁSICO</option>
+                    <option value="INTERMEDIO (Nivel 1 y Nivel 2)">INTERMEDIO</option>
+                    <option value="AVANZADO (Todos los 3 Niveles)">AVANZADO</option>
+                </select>
+            </div>
+            <!-- Selector de tipo de actividad -->
+            <div>
+                <label for="tipoActividad">Tipo de actividad:</label>
+                <select id="tipoActividad">
+                    <option value="">Selecciona una actividad</option>
+                    <option value="glosarios y/o vocabularios">Glosarios y/o vocabularios</option>
+                    <option value="resúmenes y/o compendios">Resúmenes y/o compendios</option>
+                    <option value="tablas y/o grillas">Tablas y/o grillas</option>
+                    <option value="ejemplos prácticos y/o ejercicios resueltos">Ejemplos prácticos y/o ejercicios resueltos</option>
+                    <option value="analogías y/o comparaciones">Analogías y/o comparaciones</option>
+                    <option value="mapas conceptuales y/o diagramas mentales">Mapas conceptuales y/o diagramas mentales</option>
+                    <option value="aplicaciones y/o usos en la vida real">Aplicaciones y/o usos en la vida real</option>
+                    <option value="juegos interactivo y/o actividades lúdicas">Juegos interactivos y/o actividades lúdicas</option>
+                    <option value="problemas y/o preguntas de opción múltiple con respuestas">Problemas y/o preguntas de opción múltiple con respuestas</option>
+                    <option value="problemas y/o preguntas de opción múltiple sin respuestas">Problemas y/o preguntas de opción múltiple sin respuestas</option>
+                    <option value="valoraciones y/o rúbricas de autoevaluación">Valoraciones y/o rúbricas de autoevaluación</option>
+                </select>
+            </div>
+            <!-- Botón para generar el prompt y abrir la ventana modal -->
+            <button type="submit">GENERAR PROMPT</button>
+        </form>
+        <!-- Sección para borrar y mostrar los prompts guardados -->
+        <div id="promptsGuardadosSeccion">
+            <h2>PROMPTS GUARDADOS:</h2>
+            <button id="borrarTodosPrompts" class="borrar-todos">BORRAR TODOS LOS PROMPTS GUARDADOS</button>
+            <ul id="listaPromptsGuardados"></ul>
+        </div>
+    </div>
+    <!-- Ventana modal flotante para mostrar el prompt generado -->
+    <div id="modalPrompt" class="modal">
+        <div class="modal-contenido">
+            <!-- Botón para cerrar y volver la formulario -->
+            <button id="modalBotonCerrar" class="modal-boton-cerrar">Cerrar y volver al formulario</button>
+            <!-- Botón para copiar prompt -->			
+            <button id="modalBotonCopiarArriba" class="modal-boton-copiar">COPIAR PROMPT GENERADO</button>
+            <!-- Texto con el prompt -->
+            <div id="modalResultado"></div>
+            <!-- Botón para copiar prompt -->			
+            <button id="modalBotonCopiarAbajo" class="modal-boton-copiar">COPIAR PROMPT GENERADO</button>
+            <!-- Botón para eliminar prompt -->
+            <button id="modalBotonEliminar" class="modal-boton-eliminar">Borrar solo este prompt</button>
+        </div>
+    </div>
+    <!-- links a archivos javascript -->
+    <script defer type="text/javascript" src="temas.js"></script>
+    <script defer type="text/javascript" src="prompt.js"></script>
+    <script defer type="text/javascript" src="main.js"></script>
+</body>
+</html>
