@@ -1,3 +1,22 @@
+/*
+ * Este archivo es parte del proyecto MiAplicacion.
+ *
+ * Copyright (C) 2024 Juan Pérez
+ *
+ * Este programa es software libre: puedes redistribuirlo y/o modificarlo 
+ * bajo los términos de la Licencia Pública General Affero de GNU publicada 
+ * por la Free Software Foundation, ya sea la versión 3 de la Licencia, 
+ * o (a tu elección) cualquier versión posterior.
+ *
+ * Este programa se distribuye con la esperanza de que sea útil, 
+ * pero SIN NINGUNA GARANTÍA; sin incluso la garantía implícita de 
+ * COMERCIABILIDAD o IDONEIDAD PARA UN PROPÓSITO PARTICULAR. 
+ * Consulta la Licencia Pública General Affero de GNU para más detalles.
+ *
+ * Deberías haber recibido una copia de la Licencia Pública General Affero de GNU 
+ * junto con este programa. En caso contrario, consulta <http://www.gnu.org/licenses/>.
+ */
+
 // Espera a que el DOM esté completamente cargado antes de ejecutar el script
 document.addEventListener('DOMContentLoaded', function() {
     // Objeto para almacenar referencias a elementos del DOM
