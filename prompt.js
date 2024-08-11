@@ -14,7 +14,7 @@
  * Consulta la Licencia Pública General Affero de GNU para más detalles.
  *
  * Deberías haber recibido una copia de la Licencia Pública General Affero de GNU 
- * junto con este programa. En caso contrario, consulta <http://www.gnu.org/licenses/>.
+ * junto con este programa. En caso contrario, consulta <https://www.gnu.org/licenses/why-affero-gpl.html>.
  */
 
 // Función para generar el prompt basado en los datos del formulario
