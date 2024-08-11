@@ -14,7 +14,7 @@
  * Consulta la Licencia Pública General Affero de GNU para más detalles.
  *
  * Deberías haber recibido una copia de la Licencia Pública General Affero de GNU 
- * junto con este programa. En caso contrario, consulta <http://www.gnu.org/licenses/>.
+ * junto con este programa. En caso contrario, consulta <llicencia https://www.gnu.org/licenses/why-affero-gpl.html>.
  */
 
 // Espera a que el DOM esté completamente cargado antes de ejecutar el script
