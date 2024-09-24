@@ -106,7 +106,7 @@ Nivel 3 - Comprensión de lectura literal e inferencial, y conocimiento gramatic
 
     // Generar prompt específico basado en el tipo de actividad
     switch(datos.tipoActividad) {
-        case "glosarios y/o vocabularios":
+        case "glosarios extensos":
             promptActividad = `● Desarrolle su tarea siguiendo un proceso de razonamiento paso a paso y pensamiento autocrítico, asegurando la precisión académica en ${datos.valorMateria}.
 ● Proporcione ${datos.tipoActividad} con un estilo expositivo, formal, detallado y extenso. Por ningún motivo elabore otro tipo de actividad.
 ● Cumpla rigurosamente con los lineamientos de evaluación del ICFES SABER 11 para un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad.
@@ -116,7 +116,7 @@ Nivel 3 - Comprensión de lectura literal e inferencial, y conocimiento gramatic
 ● Organice los términos en categorías lógicas dentro del tema de ${datos.valorTemaPrincipal}.`;
             break;
 
-		case "resúmenes y/o compendios":
+		case "resúmenes detallados":
             promptActividad = `● Desarrolle su tarea siguiendo un proceso de razonamiento paso a paso y pensamiento autocrítico, asegurando la precisión académica en ${datos.valorMateria}.
 ● Proporcione ${datos.tipoActividad} con un estilo expositivo, formal, detallado y extenso. Por ningún motivo elabore otro tipo de actividad.
 ● Cumpla rigurosamente con los lineamientos de evaluación del ICFES SABER 11 para un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad.
@@ -127,7 +127,7 @@ Nivel 3 - Comprensión de lectura literal e inferencial, y conocimiento gramatic
 ● Incluya cualquier fórmula, fecha o dato específico de ${datos.valorSubtema} que sea crucial para el examen SABER 11.`;
 			break;
 
-		case "tablas y/o grillas":
+		case "tablas detalladas":
             promptActividad = `● Desarrolle su tarea siguiendo un proceso de razonamiento paso a paso y pensamiento autocrítico, asegurando la precisión académica en ${datos.valorMateria}.
 ● Proporcione ${datos.tipoActividad} con un estilo expositivo, formal, detallado y extenso. Por ningún motivo elabore otro tipo de actividad.
 ● Cumpla rigurosamente con los lineamientos de evaluación del ICFES SABER 11 para un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad.
@@ -138,7 +138,7 @@ Nivel 3 - Comprensión de lectura literal e inferencial, y conocimiento gramatic
 ● Incluya cualquier fórmula, fecha o dato específico de ${datos.valorSubtema} que sea crucial para el examen SABER 11.`;
 			break;
 
-        case "ejemplos prácticos y/o ejercicios resueltos":
+        case "ejemplos prácticos resueltos":
             promptActividad = `● Desarrolle su tarea siguiendo un proceso de razonamiento paso a paso y pensamiento autocrítico, asegurando la precisión académica en ${datos.valorMateria}.
 ● Proporcione ${datos.tipoActividad} con un estilo expositivo, formal, detallado y extenso. Por ningún motivo elabore otro tipo de actividad.
 ● Cumpla rigurosamente con los lineamientos de evaluación del ICFES SABER 11 para un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad.
@@ -149,7 +149,7 @@ Nivel 3 - Comprensión de lectura literal e inferencial, y conocimiento gramatic
 ● Incluya variaciones del problema para mostrar diferentes aplicaciones del mismo concepto relacionados con la materia de ${datos.valorMateria}.`;
             break;
 
-        case "analogías y/o comparaciones":
+        case "analogías con comparaciones":
             promptActividad = `● Desarrolle su tarea siguiendo un proceso de razonamiento paso a paso y pensamiento autocrítico, asegurando la precisión académica en ${datos.valorMateria}.
 ● Proporcione ${datos.tipoActividad} con un estilo expositivo, formal, detallado y extenso. Por ningún motivo elabore otro tipo de actividad.
 ● Cumpla rigurosamente con los lineamientos de evaluación del ICFES SABER 11 para un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad.
@@ -160,7 +160,7 @@ Nivel 3 - Comprensión de lectura literal e inferencial, y conocimiento gramatic
 ● Proporcione ejemplos de cómo estas analogías pueden ayudar a resolver problemas típicos de la prueba de ${datos.valorMateria} en el examen SABER 11.`;
             break;
 
-        case "mapas conceptuales y/o diagramas mentales":
+        case "mapas conceptuales y diagramas mentales":
             promptActividad = `● Desarrolle su tarea siguiendo un proceso de razonamiento paso a paso y pensamiento autocrítico, asegurando la precisión académica en ${datos.valorMateria}.
 ● Proporcione ${datos.tipoActividad} con un estilo expositivo, formal, detallado y extenso. Por ningún motivo elabore otro tipo de actividad.
 ● Cumpla rigurosamente con los lineamientos de evaluación del ICFES SABER 11 para un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad.
@@ -171,7 +171,7 @@ Nivel 3 - Comprensión de lectura literal e inferencial, y conocimiento gramatic
 ● Proporcione una explicación detallada de cómo leer e interpretar el diagrama o mapa para un alumno con nivel ${datos.nivelDificultad} de competencia y habilidad.`;
             break;
 
-        case "aplicaciones y/o usos en la vida real":
+        case "aplicaciones y usos en la vida real":
             promptActividad = `● Desarrolle su tarea siguiendo un proceso de razonamiento paso a paso y pensamiento autocrítico, asegurando la precisión académica en ${datos.valorMateria}.
 ● Proporcione ${datos.tipoActividad} con un estilo expositivo, formal, detallado y extenso. Por ningún motivo elabore otro tipo de actividad.
 ● Cumpla rigurosamente con los lineamientos de evaluación del ICFES SABER 11 para un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad.
@@ -182,7 +182,7 @@ Nivel 3 - Comprensión de lectura literal e inferencial, y conocimiento gramatic
 ● Explique cómo estos ejemplos demuestran la relevancia de la materia de ${datos.valorMateria} en situaciones cotidianas.`;
             break;
 
-        case "juegos interactivo y/o actividades lúdicas":
+        case "juegos interactivos y actividades lúdicas":
             promptActividad = `● Desarrolle su tarea siguiendo un proceso de razonamiento paso a paso y pensamiento autocrítico, asegurando la precisión académica en ${datos.valorMateria}.
 ● Presente los ${datos.tipoActividad} con un estilo expositivo, formal, detallado y extenso. Por ningún motivo elabore otro tipo de actividad.
 ● Cumpla rigurosamente con los lineamientos de evaluación del ICFES SABER 11 para un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad.
@@ -193,7 +193,7 @@ Nivel 3 - Comprensión de lectura literal e inferencial, y conocimiento gramatic
 ● Proporcione una explicación de cómo cada elemento del juego se relaciona con los objetivos de aprendizaje.`;
             break;
 
-        case "problemas y/o preguntas de opción múltiple con respuestas":
+        case "preguntas de opción múltiple con respuestas":
             promptActividad = `● Desarrolle su tarea siguiendo un proceso de razonamiento paso a paso y pensamiento autocrítico, asegurando la precisión académica en ${datos.valorMateria}.
 ● Proporcione ${datos.tipoActividad} con un estilo expositivo, formal, detallado y extenso. Por ningún motivo elabore otro tipo de actividad.
 ● Cumpla rigurosamente con los lineamientos de evaluación del ICFES SABER 11 para un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad.
@@ -204,7 +204,7 @@ Nivel 3 - Comprensión de lectura literal e inferencial, y conocimiento gramatic
 ● Piense paso a paso y de una explicación detallada y extensa de por qué la respuesta correcta es la adecuada y por qué las otras opciones son incorrectas.`;
             break;
 
-        case "problemas y/o preguntas de opción múltiple sin respuestas":
+        case "preguntas de opción múltiple sin respuestas":
             promptActividad = `● Desarrolle su tarea siguiendo un proceso de razonamiento paso a paso y pensamiento autocrítico, asegurando la precisión académica en ${datos.valorMateria}.
 ● Proporcione ${datos.tipoActividad} con un estilo expositivo, formal, detallado y extenso. Por ningún motivo elabore otro tipo de actividad.
 ● Cumpla rigurosamente con los lineamientos de evaluación del ICFES SABER 11 para un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad.
@@ -215,7 +215,7 @@ Nivel 3 - Comprensión de lectura literal e inferencial, y conocimiento gramatic
 ● Asegúrese de que cada pregunta tenga una única respuesta correcta y que sea posible llegar a ella utilizando el conocimiento esperado de un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad en ${datos.valorMateria}.`;
             break;
 
-        case "valoraciones y/o rúbricas de autoevaluación":
+        case "valoraciones y rúbricas de autoevaluación":
             promptActividad = `● Desarrolle su tarea siguiendo un proceso de razonamiento paso a paso y pensamiento autocrítico, asegurando la precisión académica en ${datos.valorMateria}.
 ● Proporcione ${datos.tipoActividad} con un estilo expositivo, formal, detallado y extenso. Por ningún motivo elabore otro tipo de actividad.
 ● Cumpla rigurosamente con los lineamientos de evaluación del ICFES SABER 11 para un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad.
