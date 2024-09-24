@@ -32,6 +32,7 @@ junto con este programa. En caso contrario, consulta <https://www.gnu.org/licens
         <form id="formularioPrompt">
             <!-- Selector de materia -->
             <div>
+                <p id="materiaDesc" class="campo-descripcion">Selecciona la materia para la cual deseas generar un prompt.</p>
                 <label for="materia">Materia:</label>
                 <select id="materia">
                     <option value="">Selecciona una materia</option>
@@ -75,17 +76,17 @@ junto con este programa. En caso contrario, consulta <https://www.gnu.org/licens
                 <label for="tipoActividad">Tipo de actividad:</label>
                 <select id="tipoActividad">
                     <option value="">Selecciona una actividad</option>
-                    <option value="glosarios y/o vocabularios">Glosarios y/o vocabularios</option>
-                    <option value="resúmenes y/o compendios">Resúmenes y/o compendios</option>
-                    <option value="tablas y/o grillas">Tablas y/o grillas</option>
-                    <option value="ejemplos prácticos y/o ejercicios resueltos">Ejemplos prácticos y/o ejercicios resueltos</option>
-                    <option value="analogías y/o comparaciones">Analogías y/o comparaciones</option>
-                    <option value="mapas conceptuales y/o diagramas mentales">Mapas conceptuales y/o diagramas mentales</option>
-                    <option value="aplicaciones y/o usos en la vida real">Aplicaciones y/o usos en la vida real</option>
-                    <option value="juegos interactivo y/o actividades lúdicas">Juegos interactivos y/o actividades lúdicas</option>
-                    <option value="problemas y/o preguntas de opción múltiple con respuestas">Problemas y/o preguntas de opción múltiple con respuestas</option>
-                    <option value="problemas y/o preguntas de opción múltiple sin respuestas">Problemas y/o preguntas de opción múltiple sin respuestas</option>
-                    <option value="valoraciones y/o rúbricas de autoevaluación">Valoraciones y/o rúbricas de autoevaluación</option>
+                    <option value="glosarios extensos">Glosarios extensos</option>
+                    <option value="resúmenes detallados">Resúmenes detallados</option>
+                    <option value="tablas detalladas">Tablas detalladas</option>
+                    <option value="ejemplos prácticos resueltos">Ejemplos prácticos resueltos</option>
+                    <option value="analogías con comparaciones">Analogías con comparaciones</option>
+                    <option value="mapas conceptuales y diagramas mentales">Mapas conceptuales y diagramas mentales</option>
+                    <option value="aplicaciones y usos en la vida real">Aplicaciones y usos en la vida real</option>
+                    <option value="juegos interactivos y actividades lúdicas">Juegos interactivos y actividades lúdicas</option>
+                    <option value="preguntas de opción múltiple con respuestas">Preguntas de opción múltiple con respuestas</option>
+                    <option value="preguntas de opción múltiple sin respuestas">Preguntas de opción múltiple sin respuestas</option>
+                    <option value="valoraciones y rúbricas de autoevaluación">Valoraciones y rúbricas de autoevaluación</option>
                 </select>
             </div>
             <!-- Botón para generar el prompt y abrir la ventana modal -->
@@ -101,16 +102,16 @@ junto con este programa. En caso contrario, consulta <https://www.gnu.org/licens
     <!-- Ventana modal flotante para mostrar el prompt generado -->
     <div id="modalPrompt" class="modal">
         <div class="modal-contenido">
-            <!-- Botón para cerrar y volver la formulario -->
+            <!-- Botón para cerrar y volver al formulario -->
             <button id="modalBotonCerrar" class="modal-boton-cerrar">Cerrar y volver al formulario</button>
             <!-- Botón para copiar prompt -->			
             <button id="modalBotonCopiarArriba" class="modal-boton-copiar">COPIAR PROMPT GENERADO</button>
+            <!-- Botón para eliminar prompt -->
+            <button id="modalBotonEliminar" class="modal-boton-eliminar">Borrar solo este prompt</button>
             <!-- Texto con el prompt -->
             <div id="modalResultado"></div>
             <!-- Botón para copiar prompt -->			
             <button id="modalBotonCopiarAbajo" class="modal-boton-copiar">COPIAR PROMPT GENERADO</button>
-            <!-- Botón para eliminar prompt -->
-            <button id="modalBotonEliminar" class="modal-boton-eliminar">Borrar solo este prompt</button>
         </div>
     </div>
     <!-- links a archivos javascript -->
