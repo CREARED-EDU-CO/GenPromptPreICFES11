@@ -1,4 +1,7 @@
-/* Estilos generales del cuerpo de la página */
+/* ============================
+   Estilos generales
+   ============================ */
+
 body {
     font-family: 'Roboto', sans-serif;
     line-height: 1.6;
@@ -8,44 +11,59 @@ body {
     color: #333;
 }
 
-/* Contenedor principal */
+/* ============================
+   Contenedor principal
+   ============================ */
+
 .contenedor {
     width: 80%;
+    max-width: 800px;
     margin: auto;
     padding: 20px;
     background-color: #fff;
     border-radius: 10px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), 0 6px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* Estilos del formulario */
+/* ============================
+   Estilos del formulario
+   ============================ */
+
 form {
     display: flex;
     flex-direction: column;
     gap: 15px;
 }
 
-/* Espaciado entre elementos del formulario */
 form div {
     display: flex;
     flex-direction: column;
 }
 
-/* Estilos de las etiquetas */
 label {
     margin-bottom: 5px;
     font-weight: bold;
 }
 
-/* Estilos de los selectores y botones */
 select, button {
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 16px;
+    transition: all 0.3s ease;
 }
 
-/* Estilos del botón GENERAR PROMPT */
+/* Estilos para las descripciones de los campos */
+.campo-descripcion {
+    font-size: 0.9em;
+    color: #666;
+    margin-top: 5px;
+}
+
+/* ============================
+   Estilos de botones
+   ============================ */
+
 button {
     background-color: #6200ea;
     color: #ffffff;
@@ -53,15 +71,33 @@ button {
     border: none;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.1s ease;
+    letter-spacing: 1px;
 }
+
 button:active {
     transform: scale(0.98);
 }
+
 button:hover {
     background-color: #3700b3;
 }
 
-/* Estilos de la ventana modal */
+/* Estilo para el botón de borrar todos los prompts */
+.borrar-todos {
+    background-color: #ff0000;
+    color: #ffffff;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.borrar-todos:hover {
+    background-color: #cc0000;
+}
+
+/* ============================
+   Estilos de la ventana modal
+   ============================ */
+
 .modal {
     display: none;
     position: fixed;
@@ -74,44 +110,62 @@ button:hover {
     background-color: rgba(0, 0, 0, 0.4);
 }
 
-/* Contenido de la ventana modal */
 .modal-contenido {
-    position: relative;
-    top: 0;
+    position: absolute; /* Cambiado de relative a absolute */
+    top: 0; /* Eliminar top: 25% */
+    left: 50%;
+    transform: translateX(-50%);
     background-color: #ffffff;
-    margin: auto;
+    margin: 0; /* Cambiado de auto a 0 */
     padding: 20px;
     border: 1px solid #ccc;
     width: 90%;
     max-width: 600px;
+    max-height: 80vh; /* Ajustado para evitar que sea demasiado grande */
     border-radius: 10px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    overflow-y: auto;
 }
 
-/* Botón de cerrar (X) de la ventana modal */
-.modal-boton-cerrar {
-	background-color: #ff0000;
+/* Botones en la ventana modal */
+.modal-boton-cerrar,
+.modal-boton-eliminar {
+    background-color: #ff0000;
     color: #ffffff;
-    border: none;
     width: 100%;
-    padding: 10px 20px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin-top: 10px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.1s ease;
-	margin: 10px 0;
-    font-weight: bold;
+    margin: 10px 0;
 }
-.modal-boton-cerrar:hover {
+
+.modal-boton-cerrar:hover,
+.modal-boton-eliminar:hover {
     background-color: #cc0000;
 }
 
-/* Estilos del resultado en la ventana modal */
+.modal-boton-copiar {
+    margin: 10px 0;
+    background-color: #6200ea;
+    width: 100%;
+}
+
+.modal-boton-copiar:hover {
+    background-color: #3700b3;
+}
+
+.modal-boton-copiar.copiado {
+    background-color: #ff0000;
+}
+
+#modalBotonCopiarArriba {
+    margin-top: 10px;
+}
+
+#modalBotonCopiarAbajo {
+    margin-top: 19px;
+}
+
+/* Resultado en la ventana modal */
 #modalResultado {
-    margin-top: 20px;
+    margin-top: 10px;
     padding: 10px;
     background-color: #f0f0f0;
     border-radius: 5px;
@@ -119,52 +173,27 @@ button:hover {
     word-wrap: break-word;
 }
 
-/* Estilos de los botones de COPIAR PROMPT GENERADO en la ventana modal */
-.modal-boton-copiar {
-    margin: 10px 0;
-    background-color: #6200ea;
-    width: 100%;
-    font-weight: bold;
-    color: #ffffff;
-    border: none;
-    padding: 10px 20px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.1s ease;
-}
-.modal-boton-copiar:hover {
-    background-color: #3700b3;
-}
-.modal-boton-copiar.copiado {
-    background-color: #ff0000;
-}
+/* ============================
+   Estilos para prompts guardados
+   ============================ */
 
-/* Ajustes específicos para los botones de COPIAR PROMPT GENERADO */
-#modalBotonCopiarArriba {
-    margin-bottom: 0px;
-}
-#modalBotonCopiarAbajo {
-    margin-top: 19px;
-}
-
-/* Estilos para la sección de prompts guardados */
 #promptsGuardadosSeccion {
     margin-top: 20px;
     padding: 20px;
     background-color: #f0f0f0;
     border-radius: 5px;
 }
+
 #promptsGuardadosSeccion h2 {
     margin-top: 0;
     color: #333;
 }
+
 #listaPromptsGuardados {
     list-style-type: none;
     padding: 0;
 }
+
 #listaPromptsGuardados li {
     background-color: #fff;
     margin-bottom: 10px;
@@ -173,51 +202,17 @@ button:hover {
     cursor: pointer;
     transition: transform 0.2s ease;
 }
+
 #listaPromptsGuardados li:hover {
     background-color: #e0e0e0;
-    transform: translateX(5px);
+    transform: translateX(10px);
 }
 
-/* Estilo para el botón de eliminar prompt */
-.modal-boton-eliminar {
-    background-color: #ff0000;
-    color: #ffffff;
-    border: none;
-    width: 100%;
-    padding: 10px 20px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin-top: 10px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.1s ease;
-}
-.modal-boton-eliminar:hover {
-    background-color: #cc0000;
-}
+/* ============================
+   Responsiveness
+   ============================ */
 
-/* Estilo para el botón de borrar todos los prompts */
-.borrar-todos {
-    background-color: #ff0000;
-    color: #ffffff;
-    border: none;
-    width: 100%;
-    padding: 10px 20px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin-bottom: 10px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.1s ease;
-}
-.borrar-todos:hover {
-    background-color: #cc0000;
-}
-
-/* Responsiveness */
-@media all and (orientation:portrait){
+@media all and (orientation:portrait) {
     .contenedor {
         width: 80%;
         padding: 10px;
