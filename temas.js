@@ -14,7 +14,7 @@
  * Consulta la Licencia Pública General Affero de GNU para más detalles.
  *
  * Deberías haber recibido una copia de la Licencia Pública General Affero de GNU 
- * junto con este programa. En caso contrario, consulta <hhttps://www.gnu.org/licenses/why-affero-gpl.html>.
+ * junto con este programa. En caso contrario, consulta <https://www.gnu.org/licenses/why-affero-gpl.html>.
  */
 
 // Array que contiene los temas y subtemas para cada materia
