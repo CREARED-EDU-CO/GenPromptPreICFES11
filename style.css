@@ -1,34 +1,54 @@
 /* ============================
-   Estilos generales
+   Variables Globales
    ============================ */
-
-body {
-    font-family: 'Roboto', sans-serif;
-    line-height: 1.6;
-    margin: 0;
-    padding: 0;
-    background-color: #fff;
-    color: #333;
+:root {
+    --font-principal: 'Roboto', sans-serif;
+    --color-fondo: #fff;
+    --color-texto: #333;
+    --color-primario: #6200ea;
+    --color-primario-hover: #3700b3;
+    --color-peligro: #ff0000;
+    --color-peligro-hover: #cc0000;
+    --color-borde: #ccc;
+    --color-texto-secundario: #666;
+    --color-fondo-seccion: #f0f0f0;
+    --color-fondo-hover: #e0e0e0;
+    --sombra-caja: 0 10px 20px rgba(0, 0, 0, 0.2), 0 6px 6px rgba(0, 0, 0, 0.1);
+    --sombra-modal: 0 0 20px rgba(0, 0, 0, 0.2);
+    --radio-borde-grande: 10px;
+    --radio-borde-pequeno: 5px;
+    --transicion-rapida: background-color 0.3s ease, color 0.3s ease;
+    --transicion-transformacion: transform 0.2s ease;
 }
 
 /* ============================
-   Contenedor principal
+   Estilos Generales
    ============================ */
+body {
+    font-family: var(--font-principal);
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: var(--color-fondo);
+    color: var(--color-texto);
+}
 
+/* ============================
+   Contenedor Principal
+   ============================ */
 .contenedor {
     width: 80%;
     max-width: 800px;
     margin: auto;
     padding: 20px;
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), 0 6px 6px rgba(0, 0, 0, 0.1);
+    background-color: var(--color-fondo);
+    border-radius: var(--radio-borde-grande);
+    box-shadow: var(--sombra-caja);
 }
 
 /* ============================
-   Estilos del formulario
+   Formulario
    ============================ */
-
 form {
     display: flex;
     flex-direction: column;
@@ -45,59 +65,60 @@ label {
     font-weight: bold;
 }
 
-select, button {
+select {
     padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    border: 1px solid var(--color-borde);
+    border-radius: var(--radio-borde-pequeno);
     font-size: 16px;
-    transition: all 0.3s ease;
+    transition: border-color 0.3s ease;
 }
 
-/* Estilos para las descripciones de los campos */
 .campo-descripcion {
     font-size: 0.9em;
-    color: #666;
+    color: var(--color-texto-secundario);
     margin-top: 5px;
 }
 
 /* ============================
-   Estilos de botones
+   Botones
    ============================ */
-
 button {
-    background-color: #6200ea;
-    color: #ffffff;
+    padding: 10px;
+    border-radius: var(--radio-borde-pequeno);
+    font-size: 16px;
     font-weight: bold;
     border: none;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.1s ease;
     letter-spacing: 1px;
+    color: var(--color-fondo);
+    transition: var(--transicion-rapida), transform 0.1s ease;
 }
 
 button:active {
     transform: scale(0.98);
 }
 
-button:hover {
-    background-color: #3700b3;
+form button {
+    background-color: var(--color-primario);
 }
 
-/* Estilo para el botón de borrar todos los prompts */
+form button:hover {
+    background-color: var(--color-primario-hover);
+}
+
 .borrar-todos {
-    background-color: #ff0000;
-    color: #ffffff;
+    background-color: var(--color-peligro);
     width: 100%;
     margin-bottom: 10px;
 }
 
 .borrar-todos:hover {
-    background-color: #cc0000;
+    background-color: var(--color-peligro-hover);
 }
 
 /* ============================
-   Estilos de la ventana modal
+   Ventana Modal
    ============================ */
-
 .modal {
     display: none;
     position: fixed;
@@ -111,48 +132,46 @@ button:hover {
 }
 
 .modal-contenido {
-    position: absolute; /* Cambiado de relative a absolute */
-    top: 0; /* Eliminar top: 25% */
+    position: absolute;
+    top: 0;
     left: 50%;
     transform: translateX(-50%);
-    background-color: #ffffff;
-    margin: 0; /* Cambiado de auto a 0 */
+    background-color: var(--color-fondo);
+    margin: 0;
     padding: 20px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--color-borde);
     width: 90%;
     max-width: 600px;
-    max-height: 80vh; /* Ajustado para evitar que sea demasiado grande */
-    border-radius: 10px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    max-height: 80vh;
+    border-radius: var(--radio-borde-grande);
+    box-shadow: var(--sombra-modal);
     overflow-y: auto;
 }
 
-/* Botones en la ventana modal */
 .modal-boton-cerrar,
 .modal-boton-eliminar {
-    background-color: #ff0000;
-    color: #ffffff;
+    background-color: var(--color-peligro);
     width: 100%;
     margin: 10px 0;
 }
 
 .modal-boton-cerrar:hover,
 .modal-boton-eliminar:hover {
-    background-color: #cc0000;
+    background-color: var(--color-peligro-hover);
 }
 
 .modal-boton-copiar {
     margin: 10px 0;
-    background-color: #6200ea;
+    background-color: var(--color-primario);
     width: 100%;
 }
 
 .modal-boton-copiar:hover {
-    background-color: #3700b3;
+    background-color: var(--color-primario-hover);
 }
 
 .modal-boton-copiar.copiado {
-    background-color: #ff0000;
+    background-color: var(--color-peligro);
 }
 
 #modalBotonCopiarArriba {
@@ -163,30 +182,28 @@ button:hover {
     margin-top: 19px;
 }
 
-/* Resultado en la ventana modal */
 #modalResultado {
     margin-top: 10px;
     padding: 10px;
-    background-color: #f0f0f0;
-    border-radius: 5px;
+    background-color: var(--color-fondo-seccion);
+    border-radius: var(--radio-borde-pequeno);
     white-space: pre-wrap;
     word-wrap: break-word;
 }
 
 /* ============================
-   Estilos para prompts guardados
+   Prompts Guardados
    ============================ */
-
 #promptsGuardadosSeccion {
     margin-top: 20px;
     padding: 20px;
-    background-color: #f0f0f0;
-    border-radius: 5px;
+    background-color: var(--color-fondo-seccion);
+    border-radius: var(--radio-borde-pequeno);
 }
 
 #promptsGuardadosSeccion h2 {
     margin-top: 0;
-    color: #333;
+    color: var(--color-texto);
 }
 
 #listaPromptsGuardados {
@@ -195,32 +212,36 @@ button:hover {
 }
 
 #listaPromptsGuardados li {
-    background-color: #fff;
+    background-color: var(--color-fondo);
     margin-bottom: 10px;
     padding: 10px;
-    border-radius: 5px;
+    border-radius: var(--radio-borde-pequeno);
     cursor: pointer;
-    transition: transform 0.2s ease;
+    transition: var(--transicion-transformacion), background-color 0.2s ease;
 }
 
 #listaPromptsGuardados li:hover {
-    background-color: #e0e0e0;
+    background-color: var(--color-fondo-hover);
     transform: translateX(10px);
 }
 
 /* ============================
    Responsiveness
    ============================ */
-
-@media all and (orientation:portrait) {
+@media screen and (max-width: 800px) {
     .contenedor {
-        width: 80%;
-        padding: 10px;
+        width: 95%;
+        padding: 15px;
     }
+
     form {
-        gap: 10px;
+        gap: 12px;
     }
+}
+
+@media screen and (max-width: 600px) {
     .modal-contenido {
-        width: 70%;
+        width: 95%;
+        padding: 15px;
     }
 }
