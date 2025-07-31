@@ -189,6 +189,7 @@ document.addEventListener('DOMContentLoaded', function() {
         elementos.modalResultado.textContent = promptsGuardados[index].prompt;
         promptSeleccionadoIndex = index;
         elementos.modal.style.display = 'block';
+        posicionarModal(); // Asegura que el modal se posicione correctamente
     }
     
     /**
@@ -280,11 +281,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Posiciona el modal de resultados alineado con el selector de nivel de dificulta.
+    // Posiciona el modal de resultados alineado con el selector de subtema.
     function posicionarModal() {
-        const selectorMateria = document.getElementById('subtema');
+        const selectorSubtema = document.getElementById('subtema');
         const modal = document.querySelector('.modal-contenido');
-        const rect = selectorMateria.getBoundingClientRect();
+        const rect = selectorSubtema.getBoundingClientRect();
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
         
         modal.style.top = `${rect.top + scrollTop}px`;
@@ -320,15 +321,20 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         
         if (Object.values(datosFormulario).every(Boolean)) {
-            const prompt = generarPrompt(datosFormulario);
-            guardarPrompt(
-                prompt, 
-                datosFormulario.valorMateria, 
-                datosFormulario.valorTemaPrincipal, 
-                datosFormulario.valorSubtema, 
-                datosFormulario.tipoActividad
-            );
-            elementos.modalResultado.textContent = prompt;
+            try {
+                const prompt = generarPrompt(datosFormulario);
+                guardarPrompt(
+                    prompt,
+                    datosFormulario.valorMateria,
+                    datosFormulario.valorTemaPrincipal,
+                    datosFormulario.valorSubtema,
+                    datosFormulario.tipoActividad
+                );
+                elementos.modalResultado.textContent = prompt;
+            } catch (error) {
+                console.error('Error al generar el prompt:', error);
+                elementos.modalResultado.textContent = 'Ocurrió un error al generar el prompt. Por favor, revisa la consola para más detalles.';
+            }
             elementos.modal.style.display = 'block';
             posicionarModal(); // Llamar a la función para posicionar el modal
         } else {
