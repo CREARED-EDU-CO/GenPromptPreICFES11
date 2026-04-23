@@ -19,105 +19,2183 @@ junto con este programa. En caso contrario, consulta <https://www.gnu.org/licens
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generador de Prompts para el ICFES SABER 11</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Generador de Prompts para el ICFES SABER 11</title>
+	<style>
+		/* ============================
+   Variables globales
+   ============================ */
+
+		:root {
+			--font-principal: system-ui, sans-serif;
+			--color-fondo: #fff;
+			--color-texto: #333;
+			--color-primario: #6200ea;
+			--color-primario-hover: #3700b3;
+			--color-peligro: #ff0000;
+			--color-peligro-hover: #cc0000;
+			--color-borde: #ccc;
+			--color-texto-secundario: #666;
+			--color-fondo-seccion: #f0f0f0;
+			--color-fondo-hover: #e0e0e0;
+			--sombra-caja: 0 10px 20px rgba(0, 0, 0, 0.2), 0 6px 6px rgba(0, 0, 0, 0.1);
+			--sombra-modal: 0 0 20px rgba(0, 0, 0, 0.2);
+			--radio-borde-grande: 10px;
+			--radio-borde-pequeno: 5px;
+			--espaciado-botones-modal: 10px;
+			--transicion-rapida: background-color 0.3s ease, color 0.3s ease;
+			--transicion-transformacion: transform 0.2s ease;
+		}
+
+		/* ============================
+   Utilidades de accesibilidad
+   ============================ */
+
+		.sr-only {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			padding: 0;
+			margin: -1px;
+			overflow: hidden;
+			clip: rect(0, 0, 0, 0);
+			white-space: nowrap;
+			border: 0;
+		}
+
+		/* ============================
+   Reset básico
+   ============================ */
+
+		*,
+		*::before,
+		*::after {
+			box-sizing: border-box;
+		}
+
+		/* ============================
+   Estilos generales
+   ============================ */
+
+		body {
+			font-family: var(--font-principal);
+			line-height: 1.6;
+			margin: 0;
+			padding: 0;
+			background-color: var(--color-fondo);
+			color: var(--color-texto);
+		}
+
+		/* ============================
+   Contenedor principal
+   ============================ */
+
+		.contenedor {
+			width: 80%;
+			max-width: 800px;
+			margin: auto;
+			padding: 20px;
+			background-color: var(--color-fondo);
+			border-radius: var(--radio-borde-grande);
+			box-shadow: var(--sombra-caja);
+		}
+
+		/* ============================
+   Estilos del formulario
+   ============================ */
+
+		form {
+			display: flex;
+			flex-direction: column;
+			gap: 15px;
+		}
+
+		form div {
+			display: flex;
+			flex-direction: column;
+		}
+
+		label {
+			margin-bottom: 5px;
+			font-weight: bold;
+		}
+
+		select {
+			padding: 10px;
+			border: 1px solid var(--color-borde);
+			border-radius: var(--radio-borde-pequeno);
+			font-size: 16px;
+			font-family: var(--font-principal);
+			background-color: var(--color-fondo);
+			color: var(--color-texto);
+			cursor: pointer;
+			transition: border-color 0.3s ease;
+		}
+
+		select:focus {
+			outline: none;
+			border-color: var(--color-primario);
+		}
+
+		/* Estilos para las descripciones de los campos */
+		.campo-descripcion {
+			font-size: 0.9em;
+			color: var(--color-texto-secundario);
+			margin-top: 5px;
+		}
+
+		/* ============================
+   Estilos de botones
+   ============================ */
+
+		button {
+			padding: 10px;
+			border-radius: var(--radio-borde-pequeno);
+			font-size: 16px;
+			font-weight: bold;
+			font-family: var(--font-principal);
+			border: none;
+			cursor: pointer;
+			letter-spacing: 1px;
+			color: var(--color-fondo);
+			transition: var(--transicion-rapida), var(--transicion-transformacion);
+		}
+
+		button:active {
+			transform: scale(0.98);
+		}
+
+		button:focus {
+			outline: 2px solid var(--color-primario);
+			outline-offset: 2px;
+		}
+
+		form button {
+			background-color: var(--color-primario);
+		}
+
+		form button:hover {
+			background-color: var(--color-primario-hover);
+		}
+
+		/* Estilo para el botón de borrar todos los prompts */
+		.borrar-todos {
+			background-color: var(--color-peligro);
+			width: 100%;
+			margin-bottom: 10px;
+		}
+
+		.borrar-todos:hover {
+			background-color: var(--color-peligro-hover);
+		}
+
+		/* ============================
+   Estilos de la ventana modal
+   ============================ */
+
+		.modal {
+			display: none;
+			position: fixed;
+			z-index: 1;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100%;
+			overflow: auto;
+			background-color: rgba(0, 0, 0, 0.4);
+		}
+
+		.modal-contenido {
+			position: fixed;
+			top: 20px;
+			left: 50%;
+			transform: translateX(-50%);
+			background-color: var(--color-fondo);
+			margin: 0;
+			padding: 20px;
+			border: 1px solid var(--color-borde);
+			width: 90%;
+			max-width: 600px;
+			max-height: 80vh;
+			border-radius: var(--radio-borde-grande);
+			box-shadow: var(--sombra-modal);
+			overflow-y: auto;
+		}
+
+		/* Botones en la ventana modal */
+		.modal-boton-cerrar,
+		.modal-boton-eliminar {
+			background-color: var(--color-peligro);
+			width: 100%;
+			margin: var(--espaciado-botones-modal) 0;
+		}
+
+		.modal-boton-cerrar:hover,
+		.modal-boton-eliminar:hover {
+			background-color: var(--color-peligro-hover);
+		}
+
+		/* Botones de IA (Gemini y ChatGPT) */
+		.modal-boton-ia {
+			display: block;
+			margin: var(--espaciado-botones-modal) 0;
+			padding: 10px;
+			background-color: var(--color-primario);
+			color: var(--color-fondo);
+			width: 100%;
+			text-align: center;
+			text-decoration: none;
+			border-radius: var(--radio-borde-pequeno);
+			font-size: 16px;
+			font-weight: bold;
+			letter-spacing: 1px;
+			transition: var(--transicion-rapida), var(--transicion-transformacion);
+			cursor: pointer;
+			box-sizing: border-box;
+		}
+
+		.modal-boton-ia:hover {
+			background-color: var(--color-primario-hover);
+		}
+
+		.modal-boton-ia:active {
+			transform: scale(0.98);
+		}
+
+		/* Resultado en la ventana modal */
+		#modalResultado {
+			display: block;
+			margin: var(--espaciado-botones-modal) 0;
+			padding: 15px;
+			background-color: var(--color-fondo-seccion);
+			border-radius: var(--radio-borde-pequeno);
+			white-space: pre-wrap;
+			word-wrap: break-word;
+			line-height: 1.6;
+			color: var(--color-texto);
+			font-family: var(--font-principal);
+			font-size: 1rem;
+		}
+
+		/* ============================
+   Estilos para prompts guardados
+   ============================ */
+
+		#promptsGuardadosSeccion {
+			margin-top: 20px;
+			padding: 20px;
+			background-color: var(--color-fondo-seccion);
+			border-radius: var(--radio-borde-pequeno);
+		}
+
+		#promptsGuardadosSeccion h2 {
+			margin-top: 0;
+			color: var(--color-texto);
+		}
+
+		#listaPromptsGuardados {
+			list-style-type: none;
+			padding: 0;
+		}
+
+		#listaPromptsGuardados li {
+			background-color: var(--color-fondo);
+			margin-bottom: 10px;
+			padding: 10px;
+			border-radius: var(--radio-borde-pequeno);
+			cursor: pointer;
+			transition: var(--transicion-transformacion), background-color 0.2s ease;
+		}
+
+		#listaPromptsGuardados li:hover {
+			background-color: var(--color-fondo-hover);
+			transform: translateX(10px);
+		}
+
+		/* ============================
+   Responsiveness
+   ============================ */
+
+		@media screen and (max-width: 800px) {
+			.contenedor {
+				width: 95%;
+				padding: 15px;
+			}
+
+			form {
+				gap: 12px;
+			}
+		}
+
+		@media screen and (max-width: 600px) {
+			.modal-contenido {
+				width: 95%;
+				padding: 15px;
+			}
+		}
+	</style>
 </head>
+
 <body>
-    <!-- Contenedor principal del formulario -->
-    <div class="contenedor">
-        <form id="formularioPrompt">
-            <!-- Selector de materia -->
-            <div>
-                <p id="materiaDesc" class="campo-descripcion">Selecciona la materia para la cual deseas generar un prompt.</p>
-                <label for="materia">Materia:</label>
-                <select id="materia">
-                    <option value="">Selecciona una materia</option>
-                    <option value="LECTURA CRÍTICA">LECTURA CRÍTICA</option>
-                    <option value="MATEMÁTICAS">MATEMÁTICAS</option>
-                    <option value="FÍSICA">FÍSICA</option>
-                    <option value="QUÍMICA">QUÍMICA</option>
-                    <option value="BIOLOGÍA">BIOLOGÍA</option>
-                    <option value="GEOGRAFÍA">GEOGRAFÍA</option>
-                    <option value="HISTORIA">HISTORIA</option>
-                    <option value="COMPETENCIAS CIUDADANAS">COMPETENCIAS CIUDADANAS</option>
-                    <option value="INGLÉS">INGLÉS</option>
-                </select>
-            </div>
-            <!-- Selector de tema principal -->
-            <div>
-                <label for="temaPrincipal">Tema principal:</label>
-                <select id="temaPrincipal">
-                    <option value="">Primero selecciona una materia</option>
-                </select>
-            </div>
-            <!-- Selector de subtema -->
-            <div>
-                <label for="subtema">Subtema:</label>
-                <select id="subtema">
-                    <option value="">Primero selecciona un tema principal</option>
-                </select>
-            </div>
-            <!-- Selector de nivel de competencia y habilidad -->
-            <div>
-                <label for="nivelDificultad">Nivel de competencia:</label>
-                <select id="nivelDificultad">
-                    <option value="">Selecciona un nivel</option>
-                    <option value="BÁSICO (Solo Nivel 1)">BÁSICO</option>
-                    <option value="INTERMEDIO (Nivel 1 y Nivel 2)">INTERMEDIO</option>
-                    <option value="AVANZADO (Todos los 3 Niveles)">AVANZADO</option>
-                </select>
-            </div>
-            <!-- Selector de tipo de actividad -->
-            <div>
-                <label for="tipoActividad">Tipo de actividad:</label>
-                <select id="tipoActividad">
-                    <option value="">Selecciona una actividad</option>
-                    <option value="glosarios extensos">Glosarios extensos</option>
-                    <option value="resúmenes detallados">Resúmenes detallados</option>
-                    <option value="tablas detalladas">Tablas detalladas</option>
-                    <option value="ejemplos prácticos resueltos">Ejemplos prácticos resueltos</option>
-                    <option value="analogías con comparaciones">Analogías con comparaciones</option>
-                    <option value="mapas conceptuales y diagramas mentales">Mapas conceptuales y diagramas mentales</option>
-                    <option value="aplicaciones y usos en la vida real">Aplicaciones y usos en la vida real</option>
-                    <option value="juegos interactivos y actividades lúdicas">Juegos interactivos y actividades lúdicas</option>
-                    <option value="preguntas de opción múltiple con respuestas">Preguntas de opción múltiple con respuestas</option>
-                    <option value="preguntas de opción múltiple sin respuestas">Preguntas de opción múltiple sin respuestas</option>
-                    <option value="valoraciones y rúbricas de autoevaluación">Valoraciones y rúbricas de autoevaluación</option>
-                </select>
-            </div>
-            <!-- Botón para generar el prompt y abrir la ventana modal -->
-            <button type="submit">GENERAR PROMPT</button>
-        </form>
-        <!-- Sección para borrar y mostrar los prompts guardados -->
-        <div id="promptsGuardadosSeccion">
-            <h2>PROMPTS GUARDADOS:</h2>
-            <button id="borrarTodosPrompts" class="borrar-todos">BORRAR TODOS LOS PROMPTS GUARDADOS</button>
-            <ul id="listaPromptsGuardados"></ul>
-        </div>
-    </div>
-    <!-- Ventana modal flotante para mostrar el prompt generado -->
-    <div id="modalPrompt" class="modal">
-        <div class="modal-contenido">
-            <!-- Botón para cerrar y volver al formulario -->
-            <button id="modalBotonCerrar" class="modal-boton-cerrar">Cerrar y volver al formulario</button>
-            <!-- Botón para copiar prompt -->			
-            <button id="modalBotonCopiarArriba" class="modal-boton-copiar">COPIAR PROMPT GENERADO</button>
-            <!-- Botón para eliminar prompt -->
-            <button id="modalBotonEliminar" class="modal-boton-eliminar">Borrar solo este prompt</button>
-            <!-- Texto con el prompt -->
-            <div id="modalResultado"></div>
-            <!-- Botón para copiar prompt -->			
-            <button id="modalBotonCopiarAbajo" class="modal-boton-copiar">COPIAR PROMPT GENERADO</button>
-        </div>
-    </div>
-    <!-- links a archivos javascript -->
-    <script defer type="text/javascript" src="temas.js"></script>
-    <script defer type="text/javascript" src="prompt_data.js"></script>
-    <script defer type="text/javascript" src="prompt.js"></script>
-    <script defer type="text/javascript" src="main.js"></script>
+	<main>
+	<!-- Contenedor principal del formulario -->
+	<div class="contenedor">
+		<form id="formularioPrompt">
+			<!-- Selector de materia -->
+			<div>
+				<p id="materiaDesc" class="campo-descripcion">Selecciona la materia para la cual deseas generar un
+					prompt.</p>
+				<label for="materia">Materia:</label>
+				<select id="materia" aria-describedby="materiaDesc">
+					<option value="">Selecciona una materia</option>
+					<option value="LECTURA CRÍTICA">LECTURA CRÍTICA</option>
+					<option value="MATEMÁTICAS">MATEMÁTICAS</option>
+					<option value="FÍSICA">FÍSICA</option>
+					<option value="QUÍMICA">QUÍMICA</option>
+					<option value="BIOLOGÍA">BIOLOGÍA</option>
+					<option value="GEOGRAFÍA">GEOGRAFÍA</option>
+					<option value="HISTORIA">HISTORIA</option>
+					<option value="COMPETENCIAS CIUDADANAS">COMPETENCIAS CIUDADANAS</option>
+					<option value="INGLÉS">INGLÉS</option>
+				</select>
+			</div>
+			<!-- Selector de tema principal -->
+			<div>
+				<label for="temaPrincipal">Tema principal:</label>
+				<select id="temaPrincipal">
+					<option value="">Primero selecciona una materia</option>
+				</select>
+			</div>
+			<!-- Selector de subtema -->
+			<div>
+				<label for="subtema">Subtema:</label>
+				<select id="subtema">
+					<option value="">Primero selecciona un tema principal</option>
+				</select>
+			</div>
+			<!-- Selector de nivel de competencia y habilidad -->
+			<div>
+				<label for="nivelDificultad">Nivel de competencia:</label>
+				<select id="nivelDificultad">
+					<option value="">Selecciona un nivel</option>
+					<option value="BÁSICO (Solo Nivel 1)">BÁSICO</option>
+					<option value="INTERMEDIO (Nivel 1 y Nivel 2)">INTERMEDIO</option>
+					<option value="AVANZADO (Todos los 3 Niveles)">AVANZADO</option>
+				</select>
+			</div>
+			<!-- Selector de tipo de actividad -->
+			<div>
+				<label for="tipoActividad">Tipo de actividad:</label>
+				<select id="tipoActividad">
+					<option value="">Selecciona una actividad</option>
+					<option value="glosarios extensos">Glosarios extensos</option>
+					<option value="resúmenes detallados">Resúmenes detallados</option>
+					<option value="tablas detalladas">Tablas detalladas</option>
+					<option value="ejemplos prácticos resueltos">Ejemplos prácticos resueltos</option>
+					<option value="analogías con comparaciones">Analogías con comparaciones</option>
+					<option value="mapas conceptuales y diagramas mentales">Mapas conceptuales y diagramas mentales
+					</option>
+					<option value="aplicaciones y usos en la vida real">Aplicaciones y usos en la vida real</option>
+					<option value="juegos interactivos y actividades lúdicas">Juegos interactivos y actividades lúdicas
+					</option>
+					<option value="preguntas de opción múltiple con respuestas">Preguntas de opción múltiple con
+						respuestas</option>
+					<option value="preguntas de opción múltiple sin respuestas">Preguntas de opción múltiple sin
+						respuestas</option>
+					<option value="valoraciones y rúbricas de autoevaluación">Valoraciones y rúbricas de autoevaluación
+					</option>
+				</select>
+			</div>
+			<!-- Botón para generar el prompt y abrir la ventana modal -->
+			<button type="submit">GENERAR PROMPT</button>
+		</form>
+		<!-- Sección para borrar y mostrar los prompts guardados -->
+		<div id="promptsGuardadosSeccion">
+			<h2>PROMPTS GUARDADOS:</h2>
+			<button id="borrarTodosPrompts" class="borrar-todos">BORRAR TODOS LOS PROMPTS GUARDADOS</button>
+			<ul id="listaPromptsGuardados"></ul>
+		</div>
+	</div>
+	<!-- Ventana modal flotante para mostrar el prompt generado -->
+	<div id="modalPrompt" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitulo">
+		<div class="modal-contenido">
+			<h2 id="modalTitulo" class="sr-only">Prompt generado</h2>
+			<!-- Botón para cerrar y volver al formulario -->
+			<button id="modalBotonCerrar" class="modal-boton-cerrar">Cerrar y volver al formulario</button>
+			<!-- Botones para abrir en Gemini y ChatGPT -->
+			<a id="modalBotonGemini" class="modal-boton-ia" href="#" target="_blank" rel="noopener noreferrer">ABRIR EN
+				GEMINI</a>
+			<a id="modalBotonChatGPT" class="modal-boton-ia" href="#" target="_blank" rel="noopener noreferrer">ABRIR EN
+				CHATGPT</a>
+			<!-- Botón para copiar el prompt generado -->
+			<button id="modalBotonCopiar" class="modal-boton-ia">COPIAR PROMPT GENERADO</button>
+			<!-- Botón para eliminar prompt -->
+			<button id="modalBotonEliminar" class="modal-boton-eliminar">Borrar solo este prompt</button>
+			<!-- Texto con el prompt -->
+			<output id="modalResultado" aria-live="polite"></output>
+		</div>
+	</div>
+	<!-- links a archivos javascript -->
+	<script>
+
+		// Array que contiene los temas y subtemas para cada materia
+		const temas = {
+			'BIOLOGÍA': {
+				'Célula': [
+					'Estructura celular',
+					'Procariotas y Eucariotas',
+					'Célula vegetal',
+					'Célula hongo',
+					'Célula animal',
+					'Organelos',
+					'Ciclo celular',
+					'Mitosis',
+					'Meiosis',
+					'Transporte celular',
+					'Comunicaciones celulares',
+					'Diferenciación celular'
+				],
+				'Genética': [
+					'ADN',
+					'ARN',
+					'Herencia',
+					'Mutaciones',
+					'Ingeniería genética',
+					'Biotecnología',
+					'Genética de poblaciones',
+					'Genética molecular',
+					'Árboles genealógicos'
+				],
+				'Ecología': [
+					'Ecosistemas',
+					'Cadenas alimentarias',
+					'Biodiversidad',
+					'Cambio climático',
+					'Ciclos biogeoquímicos',
+					'Interacciones ecológicas',
+					'Conservación ambiental',
+					'Impacto humano en el medio ambiente',
+					'Sostenibilidad ecológica'
+				],
+				'Evolución': [
+					'Selección natural',
+					'Adaptación',
+					'Especiación',
+					'Evidencias de la evolución',
+					'Teorías evolutivas',
+					'Árboles filogenéticos',
+					'Radiación adaptativa',
+					'Extinción y biodiversidad',
+					'Taxonomía',
+					'Evolución humana'
+				],
+				'Anatomía y fisiología': [
+					'Sistema circulatorio',
+					'Sistema linfático',
+					'Sistema respiratorio',
+					'Sistema nervioso',
+					'Sistema digestivo',
+					'Sistema endocrino',
+					'Sistema exocrino',
+					'Sistema inmunológico',
+					'Sistema reproductor masculino',
+					'Sistema reproductor femenino',
+					'Sistema excretor',
+					'Sistema muscular',
+					'Sistema esquelético',
+					'Homeostasis'
+				],
+				'Microbiología': [
+					'Virus',
+					'Bacterias',
+					'Hongos',
+					'Protozoos',
+					'Inmunología',
+					'Patogénesis',
+					'Antibióticos y resistencia',
+					'Biotecnología microbiana',
+					'Ecología microbiana'
+				],
+				'Biología celular y molecular': [
+					'Metabolismo celular',
+					'Respiración celular',
+					'Fotosíntesis',
+					'Señalización celular',
+					'Biología de membranas',
+					'Reparación del ADN',
+					'Expresión génica',
+					'Ingeniería de proteínas',
+					'Biología estructural'
+				],
+				'Botánica': [
+					'Morfología vegetal',
+					'Tipos de tejidos vegetales',
+					'Fisiología vegetal',
+					'Reproducción de plantas',
+					'Fotosíntesis',
+					'Taxonomía vegetal',
+					'Plantas medicinales',
+					'Ecología de plantas',
+					'Biotecnología vegetal',
+					'Plantas transgénicas'
+				],
+				'Zoología': [
+					'Anatomía comparada',
+					'Tipos de tejidos animales',
+					'Fisiología animal',
+					'Comportamiento animal',
+					'Reproducción animal',
+					'Taxonomía animal',
+					'Ecología animal',
+					'Conservación de especies',
+					'Etología',
+					'Animales en peligro de extinción'
+				],
+				'Biología, Tecnología y Sociedad (BTS)': [
+					'Impacto de la ciencia y la tecnología en la sociedad',
+					'Interdisciplinariedad de la BTS en ciencias naturales',
+					'Temáticas globales y locales en BTS',
+					'Desarrollo de habilidades a través de BTS',
+					'Responsabilidad cívica y ciencia y tecnología',
+					'Historia y filosofía de la ciencia y la tecnología',
+					'Innovación y emprendimiento en BTS',
+					'BTS y medio ambiente',
+					'BTS en la era de la información',
+					'Bioética y avances biomédicos'
+				]
+			},
+			'QUÍMICA': {
+				'Estructura atómica': [
+					'Modelos atómicos',
+					'Partículas subatómicas',
+					'Isótopos',
+					'Configuración electrónica',
+					'Número atómico y masa atómica',
+					'Energía de ionización',
+					'Electronegatividad',
+					'Radio atómico y radio iónico',
+					'Orbitales atómicos'
+				],
+				'Tabla periódica': [
+					'Grupos y periodos',
+					'Propiedades periódicas',
+					'Metales y no metales',
+					'Elementos de transición',
+					'Elementos representativos',
+					'Lantánidos y actínidos',
+					'Historial de la tabla periódica',
+					'Tendencias periódicas',
+					'Bloques de la tabla periódica'
+				],
+				'Enlaces químicos': [
+					'Enlace iónico',
+					'Enlace covalente',
+					'Enlace metálico',
+					'Fuerzas intermoleculares',
+					'Enlace covalente polar y no polar',
+					'Teoría de la repulsión de pares electrónicos',
+					'Geometría molecular',
+					'Teoría del enlace de valencia',
+					'Hibridación de orbitales'
+				],
+				'Reacciones químicas': [
+					'Tipos de reacciones',
+					'Estequiometría',
+					'Equilibrio químico',
+					'Cinética química',
+					'Reacciones ácido-base',
+					'Redox y electroquímica',
+					'Termoquímica',
+					'Ley de conservación de la masa',
+					'Reacciones de precipitación'
+				],
+				'Química orgánica': [
+					'Hidrocarburos',
+					'Grupos funcionales',
+					'Isomería',
+					'Polímeros',
+					'Reacciones orgánicas',
+					'Química de compuestos aromáticos',
+					'Química de carbohidratos',
+					'Lípidos y proteínas',
+					'Síntesis orgánica'
+				],
+				'Química inorgánica': [
+					'Compuestos iónicos',
+					'Compuestos covalentes',
+					'Ácidos y bases',
+					'Sales',
+					'Oxidos y peróxidos',
+					'Compuestos de coordinación',
+					'Química de metales y no metales',
+					'Química de los gases',
+					'Solubilidad y productos de solubilidad'
+				],
+				'Química analítica': [
+					'Métodos de análisis cualitativo',
+					'Métodos de análisis cuantitativo',
+					'Gravimetría',
+					'Volumetría',
+					'Espectroscopía',
+					'Cromatografía',
+					'Electroforesis',
+					'Análisis instrumental',
+					'Química ambiental'
+				],
+				'Bioquímica': [
+					'Carbohidratos',
+					'Lípidos',
+					'Aminoácidos y proteínas',
+					'Ácidos nucleicos',
+					'Metabolismo y bioenergética',
+					'Enzimas',
+					'Vitaminas y coenzimas',
+					'Ciclos bioquímicos',
+					'Regulación metabólica'
+				],
+				'Fisicoquímica': [
+					'Termodinámica',
+					'Cinemática',
+					'Dinámica de fluidos',
+					'Electroquímica',
+					'Fenómenos de superficie',
+					'Estados de la materia',
+					'Teoría de colisiones',
+					'Mecánica cuántica',
+					'Espectroscopía molecular'
+				],
+				'Química, Tecnología y Sociedad (QTS)': [
+					'Impacto de la ciencia y la tecnología en la sociedad',
+					'Interdisciplinariedad de la QTS en ciencias naturales',
+					'Temáticas globales y locales en QTS',
+					'Desarrollo de habilidades a través de QTS',
+					'Responsabilidad cívica y ciencia y tecnología',
+					'Historia y filosofía de la ciencia y la tecnología',
+					'Innovación y emprendimiento en QTS',
+					'QTS y medio ambiente',
+					'QTS en la era de la información',
+					'Bioética y avances biomédicos'
+				]
+			},
+			'FÍSICA': {
+				'Mecánica': [
+					'Cinemática',
+					'Dinámica',
+					'Estática',
+					'Leyes de Newton',
+					'Trabajo y energía',
+					'Momentum y colisiones',
+					'Movimiento circular y rotacional',
+					'Gravitación',
+					'Fluidos',
+					'Oscilaciones y ondas',
+					'Mecánica de sólidos'
+				],
+				'Termodinámica': [
+					'Calor y temperatura',
+					'Leyes de la termodinámica',
+					'Procesos termodinámicos',
+					'Entropía',
+					'Máquinas térmicas',
+					'Teoría cinética de los gases',
+					'Energía interna',
+					'Capacidad calorífica',
+					'Transferencia de calor',
+					'Estados de la materia'
+				],
+				'Ondas': [
+					'Ondas mecánicas',
+					'Ondas electromagnéticas',
+					'Sonido',
+					'Óptica',
+					'Interferencia y difracción',
+					'Polarización',
+					'Efecto Doppler',
+					'Resonancia',
+					'Espectroscopía',
+					'Ondas estacionarias'
+				],
+				'Electricidad y magnetismo': [
+					'Electrostática',
+					'Circuitos eléctricos',
+					'Campo magnético',
+					'Inducción electromagnética',
+					'Ley de Coulomb',
+					'Ley de Gauss',
+					'Ley de Ampère',
+					'Ley de Faraday',
+					'Leyes de Kirchhoff',
+					'Electrónica básica',
+					'Electromagnetismo'
+				],
+				'Física moderna': [
+					'Teoría de la relatividad',
+					'Mecánica cuántica',
+					'Física nuclear',
+					'Física de partículas',
+					'Dualidad onda-partícula',
+					'Modelo estándar de partículas',
+					'Fusión y fisión nuclear',
+					'Rayos cósmicos',
+					'Astrofísica',
+					'Cosmología',
+					'Teoría del Big Bang'
+				],
+				'Óptica y fotónica': [
+					'Reflexión y refracción',
+					'Lentes y espejos',
+					'Instrumentos ópticos',
+					'Interferencia y difracción',
+					'Fibra óptica',
+					'Polarización de la luz',
+					'Lasers y fotónica',
+					'Dispositivos ópticos',
+					'Óptica cuántica',
+					'Interferometría',
+					'Holografía',
+					'Espectroscopía óptica'
+				],
+				'Física de materiales': [
+					'Propiedades mecánicas',
+					'Propiedades térmicas',
+					'Propiedades eléctricas',
+					'Propiedades magnéticas',
+					'Materiales conductores y semiconductores',
+					'Materiales compuestos',
+					'Nanoestructuras',
+					'Cristalografía',
+					'Física de superficies',
+					'Física de superconductores'
+				],
+				'Física, Tecnología y Sociedad (FTS)': [
+					'Impacto de la ciencia y la tecnología en la sociedad',
+					'Interdisciplinariedad de la FTS en ciencias naturales',
+					'Temáticas globales y locales en FTS',
+					'Desarrollo de habilidades a través de FTS',
+					'Responsabilidad cívica y ciencia y tecnología',
+					'Historia y filosofía de la ciencia y la tecnología',
+					'Innovación y emprendimiento en FTS',
+					'FTS y medio ambiente',
+					'FTS en la era de la información',
+					'Bioética y avances biomédicos'
+				]
+			},
+			'MATEMÁTICAS': {
+				'Aritmética': [
+					'Operaciones básicas',
+					'Números enteros y racionales',
+					'Fracciones y decimales',
+					'Potencias y raíces',
+					'Proporcionalidad y porcentajes',
+					'Notación científica',
+					'Divisibilidad y factorización',
+					'Números primos y compuestos',
+					'Sistemas de numeración'
+				],
+				'Conjuntos': [
+					'Definición y notación de conjuntos',
+					'Operaciones con conjuntos',
+					'Diagramas de Venn',
+					'Conjuntos numéricos',
+					'Propiedades de los conjuntos',
+					'Cardinalidad',
+					'Conjuntos infinitos',
+					'Álgebra de conjuntos',
+					'Aplicaciones de la teoría de conjuntos'
+				],
+				'Razonamiento cuantitativo': [
+					'Interpretación de datos',
+					'Resolución de problemas',
+					'Modelado matemático',
+					'Lógica matemática',
+					'Estimación y aproximación',
+					'Proporcionalidad',
+					'Conversión de unidades',
+					'Análisis dimensional',
+					'Pensamiento algorítmico'
+				],
+				'Álgebra': [
+					'Ecuaciones lineales y sistemas',
+					'Funciones y gráficas',
+					'Polinomios y factorización',
+					'Sistemas de ecuaciones',
+					'Ecuaciones cuadráticas',
+					'Desigualdades',
+					'Funciones exponenciales y logarítmicas',
+					'Matrices y determinantes',
+					'Teoría de números',
+					'Números complejos',
+					'Sucesiones y series',
+					'Funciones trigonométricas'
+				],
+				'Geometría': [
+					'Geometría plana',
+					'Paralelismo y ortogonalidad entre rectas',
+					'Trigonometría',
+					'Geometría analítica',
+					'Transformaciones geométricas',
+					'Vectores en el plano y espacio',
+					'Cónicas y cilindros',
+					'Geometría del espacio',
+					'Geometría no euclidiana',
+					'Teoremas de la geometría',
+					'Figuras geométricas',
+					'Propiedades de los triángulos',
+					'Desigualdad triangular',
+					'Propiedades de los círculos',
+					'Paralelogramos',
+					'Paralelepípedos rectos',
+					'Teorema de Pitágoras',
+					'Teorema de Tales',
+					'Coordenadas polares y cartesianas',
+					'Relaciones de congruencia y semejanza',
+					'Transformaciones en el plano',
+					'Lugares geométricos'
+				],
+				'Trigonometría': [
+					'Funciones trigonométricas',
+					'Identidades trigonométricas',
+					'Ecuaciones trigonométricas',
+					'Ley de senos y cosenos',
+					'Ángulos y sus medidas',
+					'Gráficas de funciones trigonométricas',
+					'Aplicaciones de la trigonometría',
+					'Vectores y sus aplicaciones',
+					'Funciones inversas y sus propiedades'
+				],
+				'Cálculo': [
+					'Límites y continuidad',
+					'Derivadas',
+					'Aplicaciones de la derivada',
+					'Integrales',
+					'Aplicaciones de la integral',
+					'Ecuaciones diferenciales',
+					'Series de Taylor',
+					'Cálculo vectorial',
+					'Optimización',
+					'Teoremas fundamentales del cálculo'
+				],
+				'Estadística y probabilidad': [
+					'Estadística descriptiva',
+					'Probabilidad básica',
+					'Distribuciones de probabilidad',
+					'Permutaciones',
+					'Combinaciones',
+					'Inferencia estadística',
+					'Teorema de Bayes',
+					'Regresión y correlación',
+					'Análisis de datos',
+					'Análisis de varianza y percentiles',
+					'Muestreo y estimación',
+					'Pruebas de hipótesis',
+					'Estadística no paramétrica'
+				],
+				'Matemática discreta': [
+					'Lógica matemática',
+					'Combinatoria',
+					'Teoría de grafos',
+					'Teoría de números',
+					'Algoritmos y complejidad',
+					'Álgebra booleana',
+					'Teoría de la computación',
+					'Criptografía',
+					'Relaciones y funciones discretas'
+				],
+				'Álgebra lineal': [
+					'Espacios vectoriales',
+					'Transformaciones lineales',
+					'Sistemas de ecuaciones lineales',
+					'Valores y vectores propios',
+					'Diagonalización',
+					'Formas cuadráticas',
+					'Espacios con producto interno',
+					'Aplicaciones a la geometría',
+					'Álgebra lineal numérica'
+				],
+				'Matemáticas financieras': [
+					'Interés simple y compuesto',
+					'Anualidades',
+					'Amortización',
+					'Valoración de bonos',
+					'Análisis de inversiones',
+					'Matemáticas del mercado de valores',
+					'Modelos financieros',
+					'Riesgo y diversificación',
+					'Derivados financieros'
+				],
+				'Matemáticas aplicadas': [
+					'Modelado matemático',
+					'Optimización',
+					'Teoría de juegos',
+					'Investigación de operaciones',
+					'Matemáticas en la física',
+					'Biomatemática',
+					'Matemáticas en la ingeniería',
+					'Matemáticas en la economía',
+					'Matemáticas computacionales'
+				],
+				'Historia y fundamentos de las matemáticas': [
+					'Historia de las matemáticas',
+					'Filosofía de las matemáticas',
+					'Lógica y teoría de conjuntos',
+					'Axiomas y sistemas formales',
+					'Teoremas fundamentales',
+					'Paradojas matemáticas',
+					'Conjeturas famosas',
+					'Matemáticos notables',
+					'Evolución del pensamiento matemático'
+				]
+			},
+			'COMPETENCIAS CIUDADANAS': {
+				'Conocimientos cívicos y políticos': [
+					'Constitución política de Colombia',
+					'Estructura del Estado colombiano',
+					'Derechos humanos y fundamentales',
+					'Deberes y responsabilidades ciudadanas',
+					'Organización y funcionamiento del gobierno',
+					'Mecanismos de participación ciudadana',
+					'Sistema judicial y Estado de Derecho',
+					'Políticas públicas y su impacto',
+					'Historia política y cívica nacional',
+					'Sistemas políticos comparados',
+					'Relaciones internacionales y organismos multilaterales'
+				],
+				'Argumentación y pensamiento crítico': [
+					'Análisis de perspectivas y fuentes de información',
+					'Construcción de argumentos y contrargumentos',
+					'Evaluación de la validez y solidez de argumentos',
+					'Identificación y análisis de falacias lógicas',
+					'Técnicas de debate y oratoria',
+					'Pensamiento lógico y razonamiento',
+					'Análisis crítico de medios de comunicación',
+					'Fact-checking y verificación de información',
+					'Ética en la argumentación',
+					'Retórica y persuasión responsable'
+				],
+				'Multiperspectivismo y diversidad': [
+					'Análisis de conflictos sociales y políticos',
+					'Diversidad cultural, étnica y religiosa',
+					'Perspectivas de género y orientación sexual',
+					'Interpretación de fenómenos sociales complejos',
+					'Contextos históricos y su influencia en el presente',
+					'Globalización y sus efectos en la diversidad',
+					'Inclusión y equidad social',
+					'Interculturalidad y diálogo entre culturas',
+					'Relativismo cultural vs. universalismo',
+					'Migración y sus impactos sociales'
+				],
+				'Pensamiento sistémico y análisis social': [
+					'Identificación de causas y consecuencias en problemas sociales',
+					'Interrelaciones entre sistemas económicos, políticos y sociales',
+					'Análisis de sistemas complejos en la sociedad',
+					'Dimensiones de la realidad social: local, nacional y global',
+					'Sostenibilidad y desarrollo humano integral',
+					'Teoría de sistemas aplicada a fenómenos sociales',
+					'Análisis de políticas públicas y su impacto sistémico',
+					'Prospectiva y escenarios futuros',
+					'Interdependencia global y efectos cascada',
+					'Resiliencia social y adaptación al cambio'
+				],
+				'Competencias emocionales y sociales': [
+					'Desarrollo de la empatía y compasión',
+					'Inteligencia emocional y autorregulación',
+					'Técnicas de escucha activa y comunicación asertiva',
+					'Resolución pacífica de conflictos',
+					'Negociación, mediación y construcción de consensos',
+					'Trabajo en equipo y colaboración',
+					'Liderazgo ético y servicio comunitario',
+					'Resiliencia y manejo del estrés',
+					'Toma de decisiones éticas',
+					'Construcción de relaciones interpersonales saludables'
+				],
+				'Participación ciudadana y acción social': [
+					'Diseño y gestión de proyectos comunitarios',
+					'Voluntariado y servicio social',
+					'Activismo digital y participación en línea',
+					'Organización de movimientos sociales',
+					'Participación en procesos electorales',
+					'Incidencia en políticas públicas',
+					'Veeduría ciudadana y control social',
+					'Emprendimiento social y economía solidaria',
+					'Participación en organizaciones de la sociedad civil',
+					'Diplomacia ciudadana y cooperación internacional'
+				],
+				'Ética y valores cívicos': [
+					'Fundamentos de la ética cívica',
+					'Valores democráticos y republicanos',
+					'Responsabilidad social y ambiental',
+					'Integridad y lucha contra la corrupción',
+					'Ética del cuidado y solidaridad',
+					'Justicia social y equidad',
+					'Tolerancia y respeto a la diversidad',
+					'Patriotismo crítico y constructivo',
+					'Ética de la información y uso responsable de redes sociales',
+					'Dilemas éticos en la vida pública'
+				],
+				'Alfabetización mediática y digital': [
+					'Análisis crítico de medios de comunicación',
+					'Creación de contenido digital responsable',
+					'Seguridad y privacidad en línea',
+					'Ciudadanía digital y netiqueta',
+					'Desinformación, fake news y propaganda',
+					'Big data y su impacto en la democracia',
+					'Alfabetización en redes sociales',
+					'Uso ético de la tecnología',
+					'Brecha digital y acceso a la información',
+					'Innovación tecnológica y participación ciudadana'
+				],
+				'Sostenibilidad y conciencia global': [
+					'Objetivos de Desarrollo Sostenible (ODS)',
+					'Cambio climático y acción ciudadana',
+					'Consumo responsable y economía circular',
+					'Biodiversidad y conservación',
+					'Justicia ambiental y ecología social',
+					'Energías renovables y transición energética',
+					'Seguridad alimentaria y agricultura sostenible',
+					'Ciudades sostenibles e inteligentes',
+					'Cooperación internacional para el desarrollo sostenible',
+					'Educación para el desarrollo sostenible'
+				],
+				'Derechos humanos y justicia': [
+					'Historia y evolución de los derechos humanos',
+					'Sistemas de protección de derechos humanos',
+					'Violaciones de derechos humanos y su denuncia',
+					'Derechos de grupos vulnerables y minorías',
+					'Justicia transicional y construcción de paz',
+					'Derecho internacional humanitario',
+					'Acceso a la justicia y debido proceso',
+					'Reforma del sistema de justicia',
+					'Justicia restaurativa y alternativa',
+					'Derechos digitales y privacidad'
+				]
+			},
+			'LECTURA CRÍTICA': {
+				'Comprensión literal': [
+					'Identificación de información explícita y detalles específicos en el texto',
+					'Paráfrasis y reformulación de ideas principales y secundarias',
+					'Síntesis de textos: condensación de información clave sin perder significado',
+					'Análisis de vocabulario en contexto: comprensión y aplicación de palabras clave',
+					'Localización de detalles relevantes para la comprensión global del texto',
+					'Identificación de la estructura del texto: introducción, desarrollo y conclusión',
+					'Uso de técnicas de lectura rápida y eficiente para mejorar la comprensión',
+					'Aplicación de estrategias de comprensión activa: subrayado, resumen y esquematización',
+					'Interpretación de gráficos, tablas y otros elementos visuales en textos informativos'
+				],
+				'Inferencia textual': [
+					'Deducciones lógicas basadas en información explícita',
+					'Identificación de relaciones implícitas entre ideas y conceptos',
+					'Interpretación de la intención del autor a través del texto',
+					'Formulación de conclusiones basadas en el análisis del texto',
+					'Análisis de metáforas, simbolismos y figuras retóricas',
+					'Inferencia cultural y contextual: comprensión del texto dentro de su contexto histórico y cultural',
+					'Identificación de mensajes subyacentes y temas recurrentes en el texto',
+					'Aplicación de inferencias textuales en la resolución de problemas y situaciones hipotéticas',
+					'Comparación de múltiples interpretaciones posibles del texto',
+					'Crítica interpretativa: evaluación de la validez y coherencia de las inferencias realizadas'
+				],
+				'Análisis crítico': [
+					'Identificación de argumentos principales y secundarios',
+					'Evaluación de la coherencia y la consistencia del argumento',
+					'Reconocimiento de fallacias lógicas y argumentativas',
+					'Comparación de diferentes puntos de vista y perspectivas',
+					'Análisis de la estructura del texto y la organización del contenido',
+					'Interpretación de intenciones del autor y tono del texto',
+					'Valoración de la relevancia y la actualidad del tema tratado',
+					'Crítica literaria: análisis de la forma y el contenido de textos literarios',
+					'Crítica cultural: análisis de textos en relación con el contexto social y cultural',
+					'Crítica académica: evaluación de textos académicos en términos de rigor y metodología'
+				],
+				'Tipos de texto': [
+					'Textos literarios',
+					'Textos informativos',
+					'Textos argumentativos',
+					'Textos expositivos',
+					'Textos descriptivos',
+					'Textos narrativos',
+					'Textos científicos',
+					'Textos filosóficos',
+					'Textos periodísticos'
+				],
+				'Textos literarios': [
+					'Análisis de narrativa: estructura y desarrollo de la trama',
+					'Interpretación de poesía: métrica, simbolismo y estilo',
+					'Elementos estilísticos: uso del lenguaje, metáforas y símbolos',
+					'Contexto histórico-literario: influencias y movimientos literarios',
+					'Análisis de personajes: desarrollo, motivaciones y relaciones',
+					'Géneros literarios: novela, cuento, drama y ensayo literario',
+					'Literatura universal: obras y autores destacados a nivel mundial',
+					'Literatura hispanoamericana: obras y autores representativos',
+					'Literatura contemporánea: tendencias y nuevas formas de expresión literaria',
+					'Recepción crítica: interpretación y valoración personal de obras literarias'
+				],
+				'Textos científicos': [
+					'Metodología científica: observación, experimentación, y análisis de datos',
+					'Interpretación de datos experimentales y observacionales',
+					'Hipótesis científicas: formulación y prueba',
+					'Teorías científicas: desarrollo y corroboración',
+					'Divulgación científica: comunicación clara y accesible de descubrimientos científicos',
+					'Aplicación de conceptos científicos en la vida cotidiana',
+					'Historia de la ciencia: evolución de las ideas científicas a lo largo del tiempo',
+					'Ética en la investigación científica y responsabilidad social',
+					'Interacción entre ciencia, tecnología y sociedad',
+					'Avances científicos contemporáneos y sus implicaciones'
+				],
+				'Textos filosóficos': [
+					'Conceptos filosóficos básicos',
+					'Corrientes de pensamiento filosófico',
+					'Argumentación filosófica',
+					'Ética y moral',
+					'Interpretación de textos filosóficos clásicos',
+					'Filosofía antigua: pensamiento de Sócrates, Platón y Aristóteles',
+					'Filosofía medieval: influencia de Santo Tomás de Aquino',
+					'Filosofía moderna: pensamiento de Descartes, Kant y Hegel',
+					'Filosofía contemporánea: pensamiento de Nietzsche, Wittgenstein y Foucault',
+					'Filosofía política: teorías de justicia y derechos humanos',
+					'Filosofía del lenguaje: análisis del significado y la verdad',
+					'Filosofía de la ciencia: epistemología y metodología científica'
+				]
+			},
+			'GEOGRAFÍA': {
+				'Geografía física': [
+					'Geomorfología',
+					'Climatología',
+					'Hidrografía',
+					'Biogeografía',
+					'Geología',
+					'Edafología',
+					'Oceanografía',
+					'Glaciología',
+					'Procesos geomorfológicos',
+					'Geografía de desastres naturales'
+				],
+				'Geografía humana': [
+					'Demografía',
+					'Geografía urbana',
+					'Geografía rural',
+					'Geografía económica',
+					'Geografía cultural',
+					'Geografía política',
+					'Geografía de la salud',
+					'Geografía del turismo',
+					'Geografía de la religión'
+				],
+				'Cartografía y técnicas geográficas': [
+					'Sistemas de Información Geográfica (SIG)',
+					'Teledetección',
+					'GPS y sistemas de navegación',
+					'Fotointerpretación',
+					'Elaboración de mapas',
+					'Escalas y proyecciones',
+					'Topografía',
+					'Estadística espacial',
+					'Modelado geográfico'
+				],
+				'Geografía de Colombia': [
+					'Regiones naturales',
+					'División política',
+					'Recursos naturales',
+					'Biodiversidad',
+					'Zonas climáticas de Colombia',
+					'Ecosistemas colombianos',
+					'Impactos ambientales',
+					'Desarrollo regional',
+					'Geografía económica de Colombia'
+				],
+				'Geografía de América Latina': [
+					'Regiones geográficas',
+					'Recursos naturales',
+					'Ecosistemas',
+					'Patrones de población',
+					'Movimientos migratorios',
+					'Geografía económica',
+					'Integración regional',
+					'Desafíos ambientales',
+					'Impactos de la globalización'
+				],
+				'Geografía regional': [
+					'Geografía de América',
+					'Geografía de Europa',
+					'Geografía de Asia',
+					'Geografía de África',
+					'Geografía de Oceanía',
+					'Geografía de la Antártida',
+					'Geografía del Ártico',
+					'Geografía de los océanos',
+					'Estudios regionales comparativos'
+				],
+				'Medio ambiente y desarrollo sostenible': [
+					'Cambio climático global',
+					'Conservación de ecosistemas',
+					'Gestión de recursos naturales',
+					'Energías renovables',
+					'Contaminación y manejo de residuos',
+					'Desarrollo urbano sostenible',
+					'Agricultura sostenible',
+					'Políticas ambientales',
+					'Educación ambiental'
+				],
+				'Economía': [
+					'Conceptos económicos básicos',
+					'Microeconomía',
+					'Macroeconomía',
+					'Política económica',
+					'Comercio internacional',
+					'Desarrollo económico',
+					'Sistema financiero',
+					'Economía colombiana',
+					'Indicadores económicos'
+				],
+				'Geografía económica y recursos': [
+					'Geografía industrial',
+					'Geografía agrícola',
+					'Geografía de los servicios',
+					'Geografía del transporte',
+					'Comercio internacional',
+					'Geografía de los recursos energéticos',
+					'Geografía de los recursos hídricos',
+					'Geografía de los recursos minerales',
+					'Geografía del desarrollo'
+				],
+				'Geopolítica y relaciones internacionales': [
+					'Fronteras y límites',
+					'Organizaciones internacionales',
+					'Conflictos territoriales',
+					'Geografía electoral',
+					'Movimientos migratorios',
+					'Globalización',
+					'Bloques económicos',
+					'Geografía del terrorismo',
+					'Geografía de la cooperación internacional'
+				],
+				'Geografía de la población': [
+					'Distribución de la población mundial',
+					'Crecimiento demográfico',
+					'Estructura de la población',
+					'Migraciones',
+					'Urbanización',
+					'Geografía del envejecimiento',
+					'Geografía de la pobreza',
+					'Geografía de género',
+					'Geografía de las minorías étnicas'
+				],
+				'Geografía histórica': [
+					'Evolución de los paisajes',
+					'Geografía de las civilizaciones antiguas',
+					'Geografía de la colonización',
+					'Geografía de las revoluciones industriales',
+					'Geografía de las guerras mundiales',
+					'Geografía de la descolonización',
+					'Geografía de la Guerra Fría',
+					'Geografía de la globalización',
+					'Geografía de los descubrimientos'
+				]
+			},
+			'HISTORIA': {
+				'Prehistoria': [
+					'Paleolítico',
+					'Mesolítico',
+					'Neolítico',
+					'Edad de los Metales',
+					'Evolución humana',
+					'Arte rupestre',
+					'Primeras herramientas',
+					'Domesticación de plantas y animales',
+					'Surgimiento de las primeras civilizaciones'
+				],
+				'Antiguas civilizaciones': [
+					'Mesopotamia',
+					'Antiguo Egipto',
+					'Antigua Grecia',
+					'Imperio Romano',
+					'Antigua China',
+					'Civilización del Valle del Indo',
+					'Antigua Persia',
+					'Fenicios y cartagineses',
+					'Civilizaciones precolombinas',
+					'Civilización Maya',
+					'Civilización Inca',
+					'Civilización Azteca'
+				],
+				'Edad Media': [
+					'Alta Edad Media',
+					'Baja Edad Media',
+					'Feudalismo',
+					'Cruzadas',
+					'Imperio Bizantino',
+					'Reinos medievales',
+					'Expansión del Islam medieval',
+					'Renacimiento carolingio',
+					'La Peste Negra',
+					'Guerras de los Cien Años',
+					'Cultura y sociedad medieval',
+					'Economía medieval'
+				],
+				'Edad Moderna': [
+					'Renacimiento',
+					'Reforma y Contrarreforma',
+					'Descubrimientos geográficos',
+					'Colonización de América',
+					'Absolutismo',
+					'Ilustración',
+					'Revoluciones burguesas',
+					'Revolución Industrial',
+					'Independencias americanas'
+				],
+				'Edad Contemporánea': [
+					'Revolución Francesa',
+					'Guerras napoleónicas',
+					'Imperialismo',
+					'Crisis económicas',
+					'Primera Guerra Mundial',
+					'Revolución Rusa',
+					'Período de entreguerras',
+					'Segunda Guerra Mundial',
+					'Guerra Fría',
+					'Descolonización'
+				],
+				'Historia reciente': [
+					'Caída del Muro de Berlín',
+					'Fin de la URSS',
+					'Globalización',
+					'Terrorismo internacional',
+					'Crisis económica de 2008',
+					'Primavera Árabe',
+					'Cambio climático',
+					'Revolución digital',
+					'Pandemia de COVID-19'
+				],
+				'Historia de Colombia': [
+					'Conquista y colonización',
+					'Independencia',
+					'República',
+					'Guerras civiles',
+					'La Violencia',
+					'Frente Nacional',
+					'Conflicto armado contemporáneo',
+					'Procesos de paz',
+					'Desarrollo económico y social'
+				],
+				'Historia de América Latina': [
+					'Civilizaciones precolombinas',
+					'Conquista y colonización',
+					'Independencia de las naciones latinoamericanas',
+					'Revoluciones y dictaduras',
+					'Integración regional',
+					'Movimientos sociales',
+					'Desarrollo económico y social',
+					'Relaciones internacionales',
+					'Cultura y sociedad'
+				],
+				'Historia social y cultural': [
+					'Historia de las religiones',
+					'Historia del arte',
+					'Historia de la ciencia',
+					'Historia de la tecnología',
+					'Historia de las mujeres',
+					'Historia de las minorías',
+					'Historia de la vida cotidiana',
+					'Historia de las ideas',
+					'Historia de los movimientos sociales'
+				],
+				'Historia económica': [
+					'Sistemas económicos',
+					'Revoluciones industriales',
+					'Historia del comercio',
+					'Crisis económicas',
+					'Desarrollo del capitalismo',
+					'Historia de la banca',
+					'Globalización económica',
+					'Historia de la agricultura',
+					'Historia de la energía'
+				],
+				'Historia militar': [
+					'Estrategia y tácticas',
+					'Grandes batallas',
+					'Evolución del armamento',
+					'Guerras mundiales',
+					'Guerras civiles',
+					'Guerras de independencia',
+					'Conflictos del siglo XX',
+					'Guerras asimétricas',
+					'Carrera armamentística'
+				],
+				'Historiografía y métodos históricos': [
+					'Fuentes históricas',
+					'Arqueología',
+					'Cronología',
+					'Escuelas historiográficas',
+					'Historia oral',
+					'Análisis de documentos',
+					'Interdisciplinariedad en la historia',
+					'Historia digital',
+					'Ética en la investigación histórica'
+				]
+			},
+			'INGLÉS': {
+				'A1 - Principiante': [
+					'Palabras y frases muy básicas',
+					'Nombres de objetos cotidianos',
+					'Números y fechas simples',
+					'Información personal básica',
+					'Señales y carteles comunes',
+					'Instrucciones muy simples',
+					'Mensajes cortos y sencillos',
+					'Postales breves',
+					'Formularios simples'
+				],
+				'A2 - Elemental': [
+					'Textos cortos y sencillos',
+					'Descripciones breves',
+					'Anuncios y folletos simples',
+					'Menús y horarios',
+					'Cartas personales breves',
+					'Emails informales cortos',
+					'Instrucciones básicas',
+					'Artículos de revistas simples',
+					'Historias cortas adaptadas'
+				],
+				'B1 - Intermedio': [
+					'Textos de longitud media',
+					'Artículos de periódicos sencillos',
+					'Cartas personales que describen eventos',
+					'Instrucciones de uso de aparatos',
+					'Textos argumentativos simples',
+					'Historias cortas originales',
+					'Biografías breves',
+					'Reseñas sencillas de películas o libros',
+					'Entradas de blog'
+				],
+				'Estrategias de lectura': [
+					'Identificación de ideas principales',
+					'Comprensión de vocabulario por contexto',
+					'Skimming (lectura rápida para idea general)',
+					'Scanning (buscar información específica)',
+					'Predicción del contenido',
+					'Uso de conocimientos previos',
+					'Inferencia de significados',
+					'Reconocimiento de conectores básicos',
+					'Comprensión de la estructura del texto'
+				],
+				'Temas comunes': [
+					'Vida cotidiana',
+					'Familia y amigos',
+					'Trabajo y estudios',
+					'Tiempo libre y ocio',
+					'Viajes y transporte',
+					'Comida y bebida',
+					'Compras',
+					'Salud y bienestar',
+					'Tecnología básica'
+				],
+				'Tipos de textos': [
+					'Narrativos simples',
+					'Descriptivos básicos',
+					'Informativos breves',
+					'Instruccionales sencillos',
+					'Diálogos cotidianos',
+					'Cartas y emails',
+					'Anuncios y publicidad',
+					'Artículos cortos',
+					'Entradas de redes sociales'
+				],
+				'Gramática en contexto': [
+					'Tiempos verbales básicos',
+					'Estructuras de oraciones simples',
+					'Adjetivos y adverbios comunes',
+					'Preposiciones de tiempo y lugar',
+					'Pronombres personales y posesivos',
+					'Artículos definidos e indefinidos',
+					'Comparativos y superlativos simples',
+					'Verbos modales básicos',
+					'Conectores simples'
+				],
+				'Vocabulario': [
+					'Palabras de alta frecuencia',
+					'Expresiones idiomáticas simples',
+					'Colocaciones básicas',
+					'Prefijos y sufijos comunes',
+					'Sinónimos y antónimos básicos',
+					'Vocabulario temático',
+					'Phrasal verbs simples',
+					'Falsos amigos comunes',
+					'Abreviaturas y acrónimos frecuentes'
+				],
+				'Evaluación de la comprensión': [
+					'Preguntas de verdadero/falso',
+					'Preguntas de opción múltiple',
+					'Ejercicios de completar huecos',
+					'Ordenar párrafos o eventos',
+					'Relacionar títulos con párrafos',
+					'Responder preguntas abiertas simples',
+					'Resumir ideas principales',
+					'Identificar el propósito del texto',
+					'Reconocer el tono y registro básico'
+				]
+			}
+		};
+
+	</script>
+
+	<script>
+
+		// Función para generar el prompt basado en los datos del formulario
+		function generarPrompt(datos) {
+			// Definición del prompt base con los datos generales
+			const promptBase = `Usted es el mejor docente, profesor y tutor experto en la materia de ${datos.valorMateria}. Su única tarea consiste en crear ${datos.tipoActividad} sobre el subtema de ${datos.valorSubtema}, dentro del tema general de ${datos.valorTemaPrincipal}. Este contenido debe estar dirigido a un estudiante de grado 11° de educación media o bachillerato en Colombia y con un nivel ${datos.nivelDificultad} de competencia y habilidad, quien se prepara para presentar el examen o prueba SABER 11 y necesita obtener en el resultado ICFES un alto puntaje en ${datos.valorMateria}.`;
+
+			let promptMateria = '';
+			let promptActividad = '';
+			let promptNivelDificultad = '';
+
+			// Generar prompt específico basado en la materia
+			switch (datos.valorMateria) {
+				case "LECTURA CRÍTICA":
+					promptMateria = `
+Nivel 1 - Identificar y entender los contenidos locales que conforman un texto: Esta competencia se enfoca en la comprensión del significado de palabras, expresiones y frases explícitas en el texto. Se busca entender las relaciones semánticas entre los elementos de una frase, respondiendo preguntas como "¿qué?", "¿dónde?", "¿cuándo?", "¿quién?", "¿de qué manera?" y "¿con quién?". Esta competencia es fundamental para el desarrollo de las siguientes dos.
+Nivel 2 - Comprender cómo se articulan las partes de un texto para darle un sentido global: Esta competencia evalúa la capacidad de entender cómo los elementos locales (frases, párrafos) se relacionan formal y semánticamente para dar un sentido global al texto. Implica usar el conocimiento previo para obtener conclusiones, plantear hipótesis, hacer generalizaciones, comprender el lenguaje figurado y predecir finales. Es necesaria para la siguiente competencia.
+Nivel 3 - Reflexionar a partir de un texto y evaluar su contenido: Esta competencia, la propiamente crítica, implica analizar el texto identificando la intención del autor, evaluando la validez de los argumentos, reconociendo estrategias argumentativas y retóricas, y relacionando el contenido con el contexto. Requiere un ejercicio adecuado de las dos competencias anteriores.`;
+					break;
+				case "MATEMÁTICAS":
+					promptMateria = `
+Nivel 1 - Interpretación y representación matemática: Esta competencia evalúa la capacidad de un estudiante para comprender información matemática presentada en varios formatos, como gráficos, tablas y diagramas. También evalúa su capacidad para convertir la información entre estos formatos y usarlos para identificar patrones y relaciones. Esta competencia es esencial para comprender el contexto de un problema y para comunicar información matemática de manera efectiva.
+Nivel 2 - Formulación y ejecución matemática: Esta competencia se basa en la capacidad de un estudiante para crear estrategias para resolver problemas matemáticos, ya sean puramente matemáticos o de la vida cotidiana. Esto implica seleccionar las herramientas matemáticas apropiadas, ejecutar los pasos de la solución y verificar si la respuesta tiene sentido. La competencia de formulación y ejecución requiere una comprensión profunda de los conceptos matemáticos y la capacidad de aplicarlos de manera flexible.
+Nivel 3 - Argumentación matemática: Esta competencia evalúa la capacidad de un estudiante para razonar matemáticamente y justificar sus soluciones, estrategias e interpretaciones. Esto puede implicar proporcionar ejemplos y contraejemplos, identificar errores en el razonamiento o explicar por qué una solución es válida. La argumentación es esencial para desarrollar un pensamiento matemático crítico y para comunicar ideas matemáticas de manera convincente.`;
+					break;
+				case "FÍSICA":
+					promptMateria = `
+Nivel 1 - Explicación de fenómenos físicos: Esta competencia se centra en la capacidad de construir explicaciones científicas y comprender argumentos y modelos que expliquen fenómenos físicos.
+Nivel 2 - Uso comprensivo del conocimiento físico: Esta competencia se refiere a la capacidad de comprender y aplicar conceptos científicos de la física para resolver problemas. Se evalúa la capacidad de asociar fenómenos físicos con conceptos científicos y de identificar características de estos fenómenos a partir del análisis de información.
+Nivel 3 - Indagación científica en física: Esta competencia evalúa la capacidad de comprender cómo se construye el conocimiento científico en la física a través de la investigación. Esto implica analizar preguntas de investigación, reconocer la importancia de la evidencia, sacar conclusiones, observar patrones en los datos y evaluar predicciones.`;
+					break;
+				case "QUÍMICA":
+					promptMateria = `
+Nivel 1 - Explicación de fenómenos químicos: Esta competencia se centra en la capacidad de construir explicaciones científicas y comprender argumentos y modelos que expliquen fenómenos químicos.
+Nivel 2 - Uso comprensivo del conocimiento químico: Esta competencia se refiere a la capacidad de comprender y aplicar conceptos científicos de la química para resolver problemas. Se evalúa la capacidad de asociar fenómenos químicos con conceptos científicos y de identificar características de estos fenómenos a partir del análisis de información.
+Nivel 3 - Indagación científica en química: Esta competencia evalúa la capacidad de comprender cómo se construye el conocimiento científico en la química a través de la investigación. Esto implica analizar preguntas de investigación, reconocer la importancia de la evidencia, sacar conclusiones, observar patrones en los datos y evaluar predicciones.`;
+					break;
+				case "BIOLOGÍA":
+					promptMateria = `
+Nivel 1 - Explicación de fenómenos biológicos: Esta competencia se centra en la capacidad de construir explicaciones científicas y comprender argumentos y modelos que expliquen fenómenos biológicos.
+Nivel 2 - Uso comprensivo del conocimiento biológico: Esta competencia se refiere a la capacidad de comprender y aplicar conceptos científicos de la biología para resolver problemas. Se evalúa la capacidad de asociar fenómenos biológicos con conceptos científicos y de identificar características de estos fenómenos a partir del análisis de información.
+Nivel 3 - Indagación científica en biología: Esta competencia evalúa la capacidad de comprender cómo se construye el conocimiento científico en la biología a través de la investigación. Esto implica analizar preguntas de investigación, reconocer la importancia de la evidencia, sacar conclusiones, observar patrones en los datos y evaluar predicciones.`;
+					break;
+				case "GEOGRAFÍA":
+					promptMateria = `
+Nivel 1 - Pensamiento Geográfico: Evalúa la capacidad de usar conceptos básicos de geografía y entender el ordenamiento territorial. Las habilidades incluyen:
+- Identificar y usar conceptos geográficos: Analizar preguntas con conceptos geográficos básicos.
+- Identificar dimensiones espaciales: Comprender y analizar la relación entre eventos y contextos geográficos.
+Nivel 2 - Interpretación y Análisis de Perspectivas Geográficas: Evalúa la habilidad de analizar críticamente información geográfica y valorar diferentes opiniones y perspectivas. Las habilidades incluyen:
+- Reconocer opiniones e intereses geográficos: Analizar problemáticas geográficas desde diferentes perspectivas.
+- Análisis crítico de fuentes y argumentos geográficos: Valorar fuentes, corroborar información y evaluar argumentos geográficos.
+Nivel 3 - Pensamiento Reflexivo y Sistémico en Geografía: Evalúa la capacidad de entender las dimensiones de problemáticas geográficas y usar modelos conceptuales en decisiones geográficas. Las habilidades incluyen:
+- Identificar modelos conceptuales geográficos: Conocer y aplicar modelos conceptuales en decisiones.
+- Establecer relaciones entre dimensiones geográficas: Analizar efectos de intervenciones y relaciones entre ámbitos sociales, económicos, ambientales y políticos.`;
+					break;
+				case "HISTORIA":
+					promptMateria = `
+Nivel 1 - Pensamiento Histórico: Evalúa la capacidad de usar conceptos básicos de historia y entender el ordenamiento político. Las habilidades incluyen:
+- Identificar y usar conceptos históricos: Analizar preguntas con conceptos históricos básicos.
+- Identificar dimensiones temporales: Comprender y analizar la relación entre eventos históricos y sus contextos temporales.
+Nivel 2 - Interpretación y Análisis de Perspectivas Históricas: Evalúa la habilidad de analizar críticamente información histórica y valorar diferentes opiniones y perspectivas. Las habilidades incluyen:
+- Reconocer opiniones e intereses históricos: Analizar problemáticas históricas desde diferentes perspectivas.
+- Análisis crítico de fuentes y argumentos históricos: Valorar fuentes históricas, corroborar información y evaluar argumentos históricos.
+Nivel 3 - Pensamiento Reflexivo y Sistémico en Historia: Evalúa la capacidad de entender las dimensiones de problemáticas históricas y usar modelos conceptuales en decisiones históricas. Las habilidades incluyen:
+- Identificar modelos conceptuales históricos: Conocer y aplicar modelos conceptuales en decisiones históricas.
+- Establecer relaciones entre dimensiones históricas: Analizar efectos de intervenciones y relaciones entre ámbitos históricos, sociales, económicos, ambientales y políticos.`;
+					break;
+				case "COMPETENCIAS CIUDADANAS":
+					promptMateria = `
+Nivel 1 - Pensamiento Social: Evalúa la capacidad de usar conceptos básicos de las ciencias sociales y entender el ordenamiento político. Las habilidades incluyen:
+- Identificar y usar conceptos básicos de las ciencias sociales: Analizar preguntas utilizando conceptos básicos de las ciencias sociales, incluyendo conocimientos sobre la Constitución y mecanismos de participación ciudadana.
+- Identificar dimensiones temporales y espaciales de eventos y problemáticas sociales: Comprender y analizar la relación entre eventos y contextos sociales en sus dimensiones temporales y espaciales.
+Nivel 2 - Interpretación y Análisis de Perspectivas Ciudadanas: Evalúa la habilidad de analizar críticamente información sobre asuntos políticos, económicos y culturales, y valorar diferentes opiniones y perspectivas. Las habilidades incluyen:
+- Reconocer diversas opiniones, posturas e intereses: Analizar problemáticas sociales desde las perspectivas de diferentes actores sociales, comprendiendo el origen de los conflictos y los intereses de los involucrados.
+- Análisis crítico de fuentes y argumentos: Valorar fuentes primarias y secundarias, corroborar y contextualizar información, identificar prejuicios y establecer relaciones entre argumentos, evaluando la validez de generalizaciones y la confiabilidad de las fuentes.
+Nivel 3 - Pensamiento Reflexivo y Sistémico en Ciudadanía: Evalúa la capacidad de entender las dimensiones de problemáticas sociales y usar modelos conceptuales en la toma de decisiones sociales. Las habilidades incluyen:
+- Identificar modelos conceptuales que orientan decisiones sociales: Conocer y aplicar modelos conceptuales en contextos específicos, identificando sus características y principios para valorar decisiones en relación con sus objetivos o postulados.
+- Establecer relaciones entre dimensiones presentes en una situación problemática y sus posibles alternativas de solución: Analizar los efectos de intervenciones en la vida social, reconociendo las relaciones entre los ámbitos social, económico, ambiental y político, y comprendiendo cómo las decisiones pueden favorecer ciertas dimensiones e ir en detrimento de otras.`;
+					break;
+				case "INGLÉS":
+					promptMateria = `
+Nivel 1 - Conocimiento léxico y pragmático: Debe combinar la comprensión del vocabulario y la capacidad de interpretar el propósito y el contexto de avisos y anuncios. Los estudiantes deben relacionar descripciones con palabras y reconocer el propósito comunicativo de diferentes textos, determinando dónde podrían aparecer.
+Nivel 2 - Conocimiento comunicativo y gramatical: Se evalúa la capacidad de elegir la intervención adecuada en una conversación y la correcta aplicación de las reglas gramaticales en un texto. Los estudiantes deben seleccionar las respuestas más apropiadas en diálogos y completar textos con las palabras gramaticalmente correctas.
+Nivel 3 - Comprensión de lectura literal e inferencial, y conocimiento gramatical y léxico en contexto: Demuestra la capacidad de entender información explícita, deducir significados implícitos y seleccionar palabras que sean adecuadas tanto gramatical como léxicamente dentro del contexto de un texto. Esto incluye la comprensión de la intención del autor y la interpretación de diferentes figuras retóricas.`;
+					break;
+				default:
+					promptMateria = `Enfócate en los conceptos clave y habilidades específicas requeridas para esta área de estudio en el examen SABER 11.`;
+			}
+
+			// Generar prompt específico basado en el tipo de actividad
+			switch (datos.tipoActividad) {
+				case "glosarios extensos":
+					promptActividad = `● Desarrolle su tarea siguiendo un proceso de razonamiento paso a paso y pensamiento autocrítico, asegurando la precisión académica en ${datos.valorMateria}.
+● Proporcione ${datos.tipoActividad} con un estilo expositivo, formal, detallado y extenso. Por ningún motivo elabore otro tipo de actividad.
+● Cumpla rigurosamente con los lineamientos de evaluación del ICFES SABER 11 para un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad.
+● Identifique todos los términos clave relacionados con ${datos.valorSubtema} en ${datos.valorTemaPrincipal}.
+● Asegúrese de incluir en los ${datos.tipoActividad} los términos clave que un alumno debe conocer para la prueba de ${datos.valorMateria} del examen SABER 11.
+● Proporcione definiciones claras y concisas para cada término del subtema de ${datos.valorSubtema} teniendo en cuenta que el alumno tiene un nivel ${datos.nivelDificultad} de competencia y habilidad.
+● Organice los términos en categorías lógicas dentro del tema de ${datos.valorTemaPrincipal}.`;
+					break;
+
+				case "resúmenes detallados":
+					promptActividad = `● Desarrolle su tarea siguiendo un proceso de razonamiento paso a paso y pensamiento autocrítico, asegurando la precisión académica en ${datos.valorMateria}.
+● Proporcione ${datos.tipoActividad} con un estilo expositivo, formal, detallado y extenso. Por ningún motivo elabore otro tipo de actividad.
+● Cumpla rigurosamente con los lineamientos de evaluación del ICFES SABER 11 para un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad.
+● Identifique todos los conceptos principales que cubran los aspectos más relevantes del subtema de ${datos.valorSubtema} en ${datos.valorTemaPrincipal}.
+● Asegúrese de incluir en los ${datos.tipoActividad} los conceptos clave que debe conocer para la prueba de ${datos.valorMateria} del examen SABER 11.
+● Utilice frases cortas y precisas para explicar cada concepto de ${datos.valorSubtema}.
+● Destaque las relaciones entre diferentes conceptos para un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad.
+● Incluya cualquier fórmula, fecha o dato específico de ${datos.valorSubtema} que sea crucial para el examen SABER 11.`;
+					break;
+
+				case "tablas detalladas":
+					promptActividad = `● Desarrolle su tarea siguiendo un proceso de razonamiento paso a paso y pensamiento autocrítico, asegurando la precisión académica en ${datos.valorMateria}.
+● Proporcione ${datos.tipoActividad} con un estilo expositivo, formal, detallado y extenso. Por ningún motivo elabore otro tipo de actividad.
+● Cumpla rigurosamente con los lineamientos de evaluación del ICFES SABER 11 para un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad.
+● Identifique todos los conceptos principales que cubran los aspectos más relevantes del subtema de ${datos.valorSubtema} en ${datos.valorTemaPrincipal}.
+● Asegúrese de incluir los conceptos clave que debe conocer para la prueba de ${datos.valorMateria} del examen SABER 11.
+● Organice las ${datos.tipoActividad} con la información de ${datos.valorSubtema} en filas y columnas lógicas, usando encabezados claros.
+● Destaque las relaciones entre diferentes conceptos para un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad.
+● Incluya cualquier fórmula, fecha o dato específico de ${datos.valorSubtema} que sea crucial para el examen SABER 11.`;
+					break;
+
+				case "ejemplos prácticos resueltos":
+					promptActividad = `● Desarrolle su tarea siguiendo un proceso de razonamiento paso a paso y pensamiento autocrítico, asegurando la precisión académica en ${datos.valorMateria}.
+● Proporcione ${datos.tipoActividad} con un estilo expositivo, formal, detallado y extenso. Por ningún motivo elabore otro tipo de actividad.
+● Cumpla rigurosamente con los lineamientos de evaluación del ICFES SABER 11 para un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad.
+● Cree dos ${datos.tipoActividad} que reflejen situaciones realistas o problemas típicos relacionados con ${datos.valorSubtema} en el ámbito de ${datos.valorTemaPrincipal}.
+● Proporcione una solución paso a paso para cada ejemplo o ejercicio, utilizando el lenguaje y metodología propios de la materia de ${datos.valorMateria}.
+● Explique el razonamiento detrás de cada paso de la solución para un alumno de nivel ${datos.nivelDificultad} de competencia y habilidad.
+● Conecte cada paso con los conceptos teóricos relevantes de ${datos.valorTemaPrincipal}.
+● Incluya variaciones del problema para mostrar diferentes aplicaciones del mismo concepto relacionados con la materia de ${datos.valorMateria}.`;
+					break;
+
+				case "analogías con comparaciones":
+					promptActividad = `● Desarrolle su tarea siguiendo un proceso de razonamiento paso a paso y pensamiento autocrítico, asegurando la precisión académica en ${datos.valorMateria}.
+● Proporcione ${datos.tipoActividad} con un estilo expositivo, formal, detallado y extenso. Por ningún motivo elabore otro tipo de actividad.
+● Cumpla rigurosamente con los lineamientos de evaluación del ICFES SABER 11 para un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad.
+● Identifique todos los conceptos clave de ${datos.valorSubtema} que puedan ser difíciles de entender en el contexto de ${datos.valorTemaPrincipal}.
+● Cree tres ${datos.tipoActividad} que relacionen estos conceptos con situaciones o objetos de la vida cotidiana que ayuden a entender mejor ${datos.valorSubtema}.
+● Explique detalladamente cómo cada parte de la analogía se relaciona con el concepto original de ${datos.valorTemaPrincipal}.
+● Destaque las similitudes y también las limitaciones de cada analogía para un alumno con nivel ${datos.nivelDificultad} de competencia y habilidad.
+● Proporcione ejemplos de cómo estas analogías pueden ayudar a resolver problemas típicos de la prueba de ${datos.valorMateria} en el examen SABER 11.`;
+					break;
+
+				case "mapas conceptuales y diagramas mentales":
+					promptActividad = `● Desarrolle su tarea siguiendo un proceso de razonamiento paso a paso y pensamiento autocrítico, asegurando la precisión académica en ${datos.valorMateria}.
+● Proporcione ${datos.tipoActividad} con un estilo expositivo, formal, detallado y extenso. Por ningún motivo elabore otro tipo de actividad.
+● Cumpla rigurosamente con los lineamientos de evaluación del ICFES SABER 11 para un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad.
+● Identifique todos los conceptos principales y secundarios de ${datos.valorSubtema}.
+● Cree ${datos.tipoActividad} que muestre claramente las relaciones entre estos conceptos, utilizando la terminología específica de ${datos.valorTemaPrincipal}.
+● Use formas, colores o símbolos consistentes con la materia de ${datos.valorMateria} para representar diferentes tipos de información.
+● Incluya etiquetas claras y concisas para cada elemento del mapa o diagrama.
+● Proporcione una explicación detallada de cómo leer e interpretar el diagrama o mapa para un alumno con nivel ${datos.nivelDificultad} de competencia y habilidad.`;
+					break;
+
+				case "aplicaciones y usos en la vida real":
+					promptActividad = `● Desarrolle su tarea siguiendo un proceso de razonamiento paso a paso y pensamiento autocrítico, asegurando la precisión académica en ${datos.valorMateria}.
+● Proporcione ${datos.tipoActividad} con un estilo expositivo, formal, detallado y extenso. Por ningún motivo elabore otro tipo de actividad.
+● Cumpla rigurosamente con los lineamientos de evaluación del ICFES SABER 11 para un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad.
+● Identifique tres ${datos.tipoActividad} prácticos de ${datos.valorSubtema} en la vida cotidiana o en campos profesionales.
+● Para cada aplicación, explique claramente cómo se relaciona con los conceptos estudiados en ${datos.valorTemaPrincipal}.
+● Destaque cómo entender estas aplicaciones puede ayudar a resolver preguntas de un nivel ${datos.nivelDificultad} de competencia y habilidad en la prueba de ${datos.valorMateria} del examen SABER 11.
+● Incluya ejemplos de cómo estas aplicaciones han llevado a innovaciones o avances en diferentes campos.
+● Explique cómo estos ejemplos demuestran la relevancia de la materia de ${datos.valorMateria} en situaciones cotidianas.`;
+					break;
+
+				case "juegos interactivos y actividades lúdicas":
+					promptActividad = `● Desarrolle su tarea siguiendo un proceso de razonamiento paso a paso y pensamiento autocrítico, asegurando la precisión académica en ${datos.valorMateria}.
+● Presente los ${datos.tipoActividad} con un estilo expositivo, formal, detallado y extenso. Por ningún motivo elabore otro tipo de actividad.
+● Cumpla rigurosamente con los lineamientos de evaluación del ICFES SABER 11 para un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad.
+● Cree un concepto de ${datos.tipoActividad} que se centre en los aspectos clave de ${datos.valorSubtema}.
+● Establezca reglas claras que fomenten el uso del conocimiento y las habilidades relevantes de ${datos.valorTemaPrincipal}.
+● Incluya elementos de desafío con un nivel ${datos.nivelDificultad} de competencia y habilidad, que motiven al alumno a mejorar su comprensión.
+● Asegúrese de que el juego cubra varios aspectos de subtema ${datos.valorSubtema}, similar a cómo se abordaría en la prueba de ${datos.valorMateria} de el examen SABER 11.
+● Proporcione una explicación de cómo cada elemento del juego se relaciona con los objetivos de aprendizaje.`;
+					break;
+
+				case "preguntas de opción múltiple con respuestas":
+					promptActividad = `● Desarrolle su tarea siguiendo un proceso de razonamiento paso a paso y pensamiento autocrítico, asegurando la precisión académica en ${datos.valorMateria}.
+● Proporcione ${datos.tipoActividad} con un estilo expositivo, formal, detallado y extenso. Por ningún motivo elabore otro tipo de actividad.
+● Cumpla rigurosamente con los lineamientos de evaluación del ICFES SABER 11 para un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad.
+● Cree tres ${datos.tipoActividad} que cubran diferentes aspectos de ${datos.valorSubtema} dentro del tema de ${datos.valorTemaPrincipal}.
+● Asegúrese de que las preguntas reflejen el nivel ${datos.nivelDificultad} de competencia y habilidad del alumno y el formato de las preguntas específicas de ${datos.valorMateria} en el examen ICFES SABER 11.
+● Proporcione cuatro opciones de respuesta para cada pregunta que sean extensas en contenido y detalladas en información, requiriendo comprensión de lectura y análisis del tema, e incluyendo distractores plausibles.
+● Indique la respuesta correcta para cada pregunta.
+● Piense paso a paso y de una explicación detallada y extensa de por qué la respuesta correcta es la adecuada y por qué las otras opciones son incorrectas.`;
+					break;
+
+				case "preguntas de opción múltiple sin respuestas":
+					promptActividad = `● Desarrolle su tarea siguiendo un proceso de razonamiento paso a paso y pensamiento autocrítico, asegurando la precisión académica en ${datos.valorMateria}.
+● Proporcione ${datos.tipoActividad} con un estilo expositivo, formal, detallado y extenso. Por ningún motivo elabore otro tipo de actividad.
+● Cumpla rigurosamente con los lineamientos de evaluación del ICFES SABER 11 para un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad.
+● Cree cinco ${datos.tipoActividad} que cubran diferentes aspectos de ${datos.valorSubtema} dentro del tema de ${datos.valorTemaPrincipal}.
+● Asegúrese de que las preguntas reflejen el nivel ${datos.nivelDificultad} de competencia y habilidad del alumno y el formato de las preguntas específicas de ${datos.valorMateria} en el examen ICFES SABER 11.
+● Proporcione cuatro opciones de respuesta para cada pregunta que sean extensas en contenido y detalladas en información, requiriendo comprensión de lectura y análisis del tema, e incluyendo distractores plausibles.
+● No indique cuál es la respuesta correcta.
+● Asegúrese de que cada pregunta tenga una única respuesta correcta y que sea posible llegar a ella utilizando el conocimiento esperado de un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad en ${datos.valorMateria}.`;
+					break;
+
+				case "valoraciones y rúbricas de autoevaluación":
+					promptActividad = `● Desarrolle su tarea siguiendo un proceso de razonamiento paso a paso y pensamiento autocrítico, asegurando la precisión académica en ${datos.valorMateria}.
+● Proporcione ${datos.tipoActividad} con un estilo expositivo, formal, detallado y extenso. Por ningún motivo elabore otro tipo de actividad.
+● Cumpla rigurosamente con los lineamientos de evaluación del ICFES SABER 11 para un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad.
+● Identifique todas las competencias evaluadas en ${datos.valorMateria}, relacionadas con ${datos.valorSubtema} y que sean relevantes para un nivel ${datos.nivelDificultad} de competencia y habilidad.
+● Para cada competencia, cree ${datos.tipoActividad} para tres niveles de avance o progreso en ${datos.valorSubtema} (por ejemplo: en desarrollo, competente, finalizado).
+● Asegúrese de que las ${datos.tipoActividad} sean específicos, observables y medibles para el nivel ${datos.nivelDificultad} de competencia y habilidad en ${datos.valorMateria}.
+● Incluya una columna para que el alumno puedan anotar evidencias de su desempeño en cada criterio de autoevaluación.
+● Proporcione instrucciones claras sobre cómo usar la rúbrica y cómo interpretar los resultados para la materia de ${datos.valorMateria}.`;
+					break;
+
+				default:
+					promptActividad = `● Desarrolle su tarea siguiendo un proceso de razonamiento paso a paso y pensamiento autocrítico, asegurando la precisión académica en ${datos.valorMateria}.
+● Proporcione ${datos.tipoActividad} con un estilo expositivo, formal, detallado y extenso. Por ningún motivo elabore otro tipo de actividad.
+● Cumpla rigurosamente con los lineamientos de evaluación del ICFES SABER 11 para un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad.
+● Identifique todos los conceptos clave de ${datos.valorSubtema} que son relevantes para el examen SABER 11.
+● Cree contenido que aborde estos conceptos de manera clara y concisa.
+● Incluya ejemplos, explicaciones y ejercicios prácticos.
+● Asegúrese de que el contenido esté alineado con las tres competencias evaluadas en el examen ICFES SABER 11 para ${datos.valorMateria}.
+● Adapte el formato y el estilo del contenido para que sea atractivo y fácil de entender para un alumno en Grado 11° de Colombia con un nivel ${datos.nivelDificultad} de competencia.`;
+			}
+
+			// Generar prompt específico basado en el nivel de dificultad
+			switch (datos.nivelDificultad) {
+				case "BÁSICO (Solo Nivel 1)":
+					promptNivelDificultad = `Para este estudiante de nivel BÁSICO, enfócate solo en el primer nivel de competencia y habilidad (Nivel 1) evaluado por el ICFES SABER 11 para la prueba de ${datos.valorMateria}. Asegúrate de que el contenido sea accesible y fácil de entender, proporcionando explicaciones claras y sencillas por medio de ${datos.tipoActividad}. El objetivo es ayudar al estudiante a desarrollar la primer competencia y habilidad con una comprensión fundamental de los conceptos mínimos relacionados con ${datos.valorSubtema} en el tema de ${datos.valorTemaPrincipal}.`;
+					break;
+				case "INTERMEDIO (Nivel 1 y Nivel 2)":
+					promptNivelDificultad = `Para este estudiante de nivel INTERMEDIO, aborda solo los dos primeros niveles de competencias y habilidades (Niveles 1 y 2) evaluados por el ICFES SABER 11 para la prueba de ${datos.valorMateria}. El contenido debe introducir conceptos más complejos que el nivel básico, requiriendo un mayor nivel de análisis. Proporciona ${datos.tipoActividad} que muestren cómo se interrelacionan las dos primeras competencias y habilidades en el contexto de ${datos.valorSubtema} en el tema de ${datos.valorTemaPrincipal}.`;
+					break;
+				case "AVANZADO (Todos los 3 Niveles)":
+					promptNivelDificultad = `Para este estudiante de nivel AVANZADO, integra los tres niveles de competencias y habilidades (Niveles 1, 2 y 3) evaluados por el ICFES SABER 11 para la prueba de ${datos.valorMateria}. El contenido debe requerir de pensamiento crítico y análisis. Incluye ${datos.tipoActividad} que necesiten la aplicación simultánea de múltiples conceptos y de las tres competencias y habilidades, fomentando la capacidad del estudiante para hacer conexiones entre diferentes aspectos de ${datos.valorSubtema} en el tema de ${datos.valorTemaPrincipal} y su aplicación en situaciones del mundo real.`;
+					break;
+				default:
+					promptNivelDificultad = `Adapta el contenido al nivel de dificultad apropiado para un estudiante promedio de Grado 11° que se prepara para el examen SABER 11 en ${datos.valorMateria}.`;
+			}
+
+			// Retorna el prompt completo combinando todas las partes
+			return `${promptBase}
+
+Los lineamientos de evaluación del ICFES SABER 11 para las competencias y habilidades en la prueba de ${datos.valorMateria} son los siguientes tres niveles: ${promptMateria}
+
+Siga siempre la siguiente recomendación al crear ${datos.tipoActividad} pero no la repita en su respuesta:
+${promptNivelDificultad}
+
+Su tarea, como experto en ${datos.valorMateria}, consiste en crear ${datos.tipoActividad}, considerando que el alumno tiene un nivel ${datos.nivelDificultad} de competencia y habilidad en ${datos.valorSubtema} dentro del tema de ${datos.valorTemaPrincipal}. Al hacer su tarea, es fundamental para el éxito del alumno que siga estrictamente las siguientes instrucciones específicas obligatorias:
+${promptActividad}
+`;
+		}
+
+	</script>
+
+	<script>
+		// Espera a que el DOM esté completamente cargado antes de ejecutar el script
+		document.addEventListener('DOMContentLoaded', function () {
+			// ============================
+			// VARIABLES GLOBALES
+			// ============================
+
+			// Objeto para almacenar referencias a elementos del DOM
+			const elementos = {
+				materia: document.getElementById('materia'),
+				temaPrincipal: document.getElementById('temaPrincipal'),
+				subtema: document.getElementById('subtema'),
+				tipoActividad: document.getElementById('tipoActividad'),
+				nivelDificultad: document.getElementById('nivelDificultad'),
+				formulario: document.getElementById('formularioPrompt'),
+				modal: document.getElementById('modalPrompt'),
+				modalResultado: document.getElementById('modalResultado'),
+				modalBotonGemini: document.getElementById('modalBotonGemini'),
+				modalBotonChatGPT: document.getElementById('modalBotonChatGPT'),
+				modalBotonCerrar: document.getElementById('modalBotonCerrar'),
+				modalBotonCopiar: document.getElementById('modalBotonCopiar'),
+				listaPromptsGuardados: document.getElementById('listaPromptsGuardados'),
+				modalBotonEliminar: document.getElementById('modalBotonEliminar'),
+				borrarTodosPrompts: document.getElementById('borrarTodosPrompts')
+			};
+
+			// Variables para manejar prompts guardados
+			let promptsGuardados = JSON.parse(localStorage.getItem('promptsGuardados')) || [];
+			let promptSeleccionadoIndex = -1;
+
+			// ============================
+			// FUNCIONES AUXILIARES
+			// ============================
+
+			/**
+			 * Llena un elemento select con opciones.
+			 * @param {HTMLSelectElement} elementoSelect - El elemento select a llenar.
+			 * @param {string[]} opciones - Array de opciones para el select.
+			 * @param {string} textoDefecto - Texto para la opción por defecto.
+			 */
+			function poblarSelect(elementoSelect, opciones, textoDefecto) {
+				elementoSelect.innerHTML = `<option value="">${textoDefecto}</option>`;
+				opciones.forEach(opcion => {
+					const elementoOpcion = document.createElement('option');
+					elementoOpcion.value = opcion;
+					elementoOpcion.textContent = opcion;
+					elementoSelect.appendChild(elementoOpcion);
+				});
+			}
+
+			/**
+			 * Muestra un mensaje de error en una ventana modal.
+			 * @param {string} mensaje - El mensaje de error a mostrar.
+			 */
+			function mostrarError(mensaje) {
+				const contenedorModal = document.createElement('div');
+				contenedorModal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        `;
+
+				const divError = document.createElement('div');
+				divError.textContent = mensaje;
+				divError.style.cssText = `
+            background-color: #ffffff;
+            color: #ff0000;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 80%;
+            text-align: center;
+        `;
+
+				contenedorModal.appendChild(divError);
+				document.body.appendChild(contenedorModal);
+
+				contenedorModal.addEventListener('click', function (evento) {
+					if (evento.target === contenedorModal) {
+						contenedorModal.remove();
+					}
+				});
+
+				setTimeout(() => {
+					contenedorModal.remove();
+				}, 3000);
+			}
+
+			/**
+			 * Actualiza los enlaces de los botones de IA con el prompt.
+			 * @param {string} prompt - El prompt a incluir en los enlaces.
+			 */
+			function actualizarEnlacesIA(prompt) {
+				try {
+					// Validar que los elementos existen antes de actualizar
+					if (elementos.modalBotonGemini && elementos.modalBotonChatGPT) {
+						elementos.modalBotonGemini.href = `https://gemini.google.com/guided-learning?query=${encodeURIComponent(prompt)}`;
+						elementos.modalBotonChatGPT.href = `https://chatgpt.com/?prompt=${encodeURIComponent(prompt)}&hints=study`;
+					} else {
+						console.warn('Los botones de IA no están disponibles en el DOM');
+					}
+				} catch (error) {
+					console.error('Error al actualizar enlaces de IA:', error);
+					// No lanzar el error para evitar bloquear la ejecución
+				}
+			}
+
+			/**
+			 * Copia el texto del prompt al portapapeles con fallback para Google Sites.
+			 */
+			function copiarAlPortapapeles() {
+				const texto = elementos.modalResultado.textContent;
+
+				// Intento con la API moderna (requiere HTTPS y permisos de iframe)
+				if (navigator.clipboard && window.isSecureContext) {
+					navigator.clipboard.writeText(texto).then(() => {
+						confirmarCopiado();
+					}).catch(() => {
+						copiadoFallback(texto);
+					});
+				} else {
+					copiadoFallback(texto);
+				}
+
+				function confirmarCopiado() {
+					elementos.modalBotonCopiar.textContent = 'PROMPT COPIADO';
+					setTimeout(() => {
+						elementos.modalBotonCopiar.textContent = 'COPIAR PROMPT GENERADO';
+					}, 2000);
+				}
+
+				function copiadoFallback(textoACopiar) {
+					try {
+						const textArea = document.createElement("textarea");
+						textArea.value = textoACopiar;
+						// Asegurar que no sea visible pero esté en el DOM para poder ser seleccionado
+						textArea.style.position = "fixed";
+						textArea.style.left = "-9999px";
+						textArea.style.top = "0";
+						document.body.appendChild(textArea);
+						textArea.focus();
+						textArea.select();
+						const exito = document.execCommand('copy');
+						document.body.removeChild(textArea);
+						if (exito) {
+							confirmarCopiado();
+						} else {
+							throw new Error('execCommand falló');
+						}
+					} catch (err) {
+						console.error('Error en fallback de copia: ', err);
+						mostrarError('No se pudo copiar automáticamente. Por favor, copia el texto manualmente.');
+					}
+				}
+			}
+
+			/**
+			 * Guarda un prompt en el almacenamiento local.
+			 * @param {string} prompt - El prompt a guardar.
+			 * @param {string} materia - La materia del prompt.
+			 * @param {string} temaPrincipal - El tema principal del prompt.
+			 * @param {string} subtema - El subtema del prompt.
+			 * @param {string} tipoActividad - El tipo de actividad del prompt.
+			 */
+			function guardarPrompt(prompt, materia, temaPrincipal, subtema, tipoActividad) {
+				promptsGuardados.push({ prompt, materia, temaPrincipal, subtema, tipoActividad });
+				try {
+					localStorage.setItem('promptsGuardados', JSON.stringify(promptsGuardados));
+				} catch (e) {
+					console.warn('No se pudo guardar en localStorage:', e);
+				}
+				actualizarListaPromptsGuardados();
+			}
+
+			/**
+			 * Elimina un prompt del almacenamiento local.
+			 * @param {number} index - El índice del prompt a eliminar.
+			 */
+			function eliminarPrompt(index) {
+				promptsGuardados.splice(index, 1);
+				try {
+					localStorage.setItem('promptsGuardados', JSON.stringify(promptsGuardados));
+				} catch (e) {
+					console.warn('No se pudo guardar en localStorage:', e);
+				}
+				actualizarListaPromptsGuardados();
+			}
+
+			/**
+			 * Actualiza la lista de prompts guardados en la interfaz.
+			 */
+			function actualizarListaPromptsGuardados() {
+				elementos.listaPromptsGuardados.innerHTML = '';
+				promptsGuardados.forEach((promptData, index) => {
+					const li = document.createElement('li');
+					li.textContent = `${index + 1}. ${promptData.materia}: ${promptData.temaPrincipal} - ${promptData.subtema}. Actividad de ${promptData.tipoActividad}`;
+					li.addEventListener('click', () => mostrarPromptGuardado(index));
+					elementos.listaPromptsGuardados.appendChild(li);
+				});
+			}
+
+			/**
+			 * Muestra un prompt guardado en la ventana modal.
+			 * @param {number} index - El índice del prompt a mostrar.
+			 */
+			function mostrarPromptGuardado(index) {
+				const prompt = promptsGuardados[index].prompt;
+				elementos.modalResultado.textContent = prompt;
+				actualizarEnlacesIA(prompt);
+				promptSeleccionadoIndex = index;
+				elementos.modalBotonEliminar.disabled = false;
+				elementos.modal.style.display = 'block';
+			}
+
+			/**
+			 * Borra todos los prompts guardados.
+			 */
+			function borrarTodosLosPrompts() {
+				promptsGuardados = [];
+				try {
+					localStorage.removeItem('promptsGuardados');
+				} catch (e) {
+					console.warn('No se pudo limpiar localStorage:', e);
+				}
+				actualizarListaPromptsGuardados();
+			}
+
+			/**
+			 * Muestra una ventana de confirmación.
+			 * @param {string} mensaje - El mensaje de confirmación.
+			 * @param {Function} onConfirm - Función a ejecutar si se confirma.
+			 */
+			function mostrarConfirmacion(mensaje, onConfirm) {
+				const contenedorModal = document.createElement('div');
+				contenedorModal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        `;
+
+				const divConfirmacion = document.createElement('div');
+				divConfirmacion.style.cssText = `
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 80%;
+            text-align: center;
+        `;
+
+				const textoMensaje = document.createElement('p');
+				textoMensaje.textContent = mensaje;
+				textoMensaje.style.marginBottom = '20px';
+
+				const botonConfirmar = document.createElement('button');
+				botonConfirmar.textContent = 'Confirmar';
+				botonConfirmar.style.cssText = `
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        `;
+
+				const botonCancelar = document.createElement('button');
+				botonCancelar.textContent = 'Cancelar';
+				botonCancelar.style.cssText = `
+            background-color: #f44336;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        `;
+
+				divConfirmacion.appendChild(textoMensaje);
+				divConfirmacion.appendChild(botonConfirmar);
+				divConfirmacion.appendChild(botonCancelar);
+				contenedorModal.appendChild(divConfirmacion);
+				document.body.appendChild(contenedorModal);
+
+				botonConfirmar.addEventListener('click', () => {
+					onConfirm();
+					contenedorModal.remove();
+				});
+
+				botonCancelar.addEventListener('click', () => {
+					contenedorModal.remove();
+				});
+
+				contenedorModal.addEventListener('click', function (evento) {
+					if (evento.target === contenedorModal) {
+						contenedorModal.remove();
+					}
+				});
+			}
+
+			// ============================
+			// EVENT LISTENERS
+			// ============================
+
+			// Evento para cambio en el selector de materia
+			elementos.materia.addEventListener('change', function () {
+				const materiaSeleccionada = this.value;
+				poblarSelect(elementos.temaPrincipal, Object.keys(temas[materiaSeleccionada] || {}), 'Selecciona un tema principal');
+				poblarSelect(elementos.subtema, [], 'Primero selecciona un tema principal');
+			});
+
+			// Evento para cambio en el selector de tema principal
+			elementos.temaPrincipal.addEventListener('change', function () {
+				const materiaSeleccionada = elementos.materia.value;
+				const temaSeleccionado = this.value;
+				poblarSelect(elementos.subtema, temas[materiaSeleccionada]?.[temaSeleccionado] || [], 'Selecciona un subtema');
+			});
+
+			// Evento para envío del formulario
+			elementos.formulario.addEventListener('submit', function (e) {
+				e.preventDefault();
+				const datosFormulario = {
+					valorMateria: elementos.materia.value,
+					valorTemaPrincipal: elementos.temaPrincipal.value,
+					valorSubtema: elementos.subtema.value,
+					tipoActividad: elementos.tipoActividad.value,
+					nivelDificultad: elementos.nivelDificultad.value,
+				};
+
+				if (Object.values(datosFormulario).every(Boolean)) {
+					try {
+						const prompt = generarPrompt(datosFormulario);
+						guardarPrompt(
+							prompt,
+							datosFormulario.valorMateria,
+							datosFormulario.valorTemaPrincipal,
+							datosFormulario.valorSubtema,
+							datosFormulario.tipoActividad
+						);
+						promptSeleccionadoIndex = promptsGuardados.length - 1;
+						elementos.modalResultado.textContent = prompt;
+						actualizarEnlacesIA(prompt);
+					} catch (error) {
+						console.error('Error al generar el prompt:', error);
+						elementos.modalResultado.textContent = 'Ocurrió un error al generar el prompt. Por favor, revisa la consola para más detalles.';
+					}
+					elementos.modalBotonCopiar.textContent = 'COPIAR PROMPT GENERADO';
+					elementos.modalBotonEliminar.disabled = false;
+					elementos.modal.style.display = 'block';
+				} else {
+					mostrarError('Por favor, completa todos los campos.');
+				}
+			});
+
+			// Evento para copiar el prompt
+			elementos.modalBotonCopiar.addEventListener('click', copiarAlPortapapeles);
+
+			// Los botones de IA ahora son enlaces <a> que se actualizan dinámicamente
+			// No necesitan event listeners adicionales
+
+			// Evento para cerrar la ventana modal
+			elementos.modalBotonCerrar.onclick = () => elementos.modal.style.display = 'none';
+
+			// Evento para cerrar la ventana modal al hacer clic fuera de ella
+			window.addEventListener('click', (evento) => {
+				if (evento.target == elementos.modal) {
+					elementos.modal.style.display = 'none';
+				}
+			});
+
+			// Evento para eliminar un prompt
+			elementos.modalBotonEliminar.addEventListener('click', () => {
+				if (promptSeleccionadoIndex !== -1) {
+					eliminarPrompt(promptSeleccionadoIndex);
+					elementos.modal.style.display = 'none';
+					promptSeleccionadoIndex = -1;
+				}
+			});
+
+			// Evento para borrar todos los prompts
+			elementos.borrarTodosPrompts.addEventListener('click', function () {
+				mostrarConfirmacion('¿Estás seguro de que quieres borrar todos los prompts guardados?', borrarTodosLosPrompts);
+			});
+
+			// ============================
+			// INICIALIZACIÓN
+			// ============================
+
+			// Inicializar la lista de prompts guardados
+			actualizarListaPromptsGuardados();
+		});
+	</script>
 </body>
+
 </html>
