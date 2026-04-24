@@ -1818,7 +1818,23 @@ ${promptActividad}
 			};
 
 			// Variables para manejar prompts guardados
-			let promptsGuardados = JSON.parse(localStorage.getItem('promptsGuardados')) || [];
+			function cargarPromptsGuardados() {
+				try {
+					const promptsSerializados = localStorage.getItem('promptsGuardados');
+					if (!promptsSerializados) {
+						return [];
+					}
+
+					const promptsParseados = JSON.parse(promptsSerializados);
+					return Array.isArray(promptsParseados) ? promptsParseados : [];
+				} catch (e) {
+					console.warn('No se pudieron cargar los prompts guardados:', e);
+					localStorage.removeItem('promptsGuardados');
+					return [];
+				}
+			}
+
+			let promptsGuardados = cargarPromptsGuardados();
 			let promptSeleccionadoIndex = -1;
 
 			// ============================
@@ -2197,5 +2213,4 @@ ${promptActividad}
 		});
 	</script>
 </body>
-
 </html>
