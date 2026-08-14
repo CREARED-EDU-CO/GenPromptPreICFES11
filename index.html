@@ -416,7 +416,7 @@
 				<p id="materiaDesc" class="campo-descripcion">Selecciona la materia para la cual deseas generar un
 					prompt.</p>
 				<label for="materia">Materia:</label>
-				<select id="materia" aria-describedby="materiaDesc">
+					<select id="materia" aria-describedby="materiaDesc" required>
 					<option value="">Selecciona una materia</option>
 					<option value="LECTURA CRÍTICA">LECTURA CRÍTICA</option>
 					<option value="MATEMÁTICAS">MATEMÁTICAS</option>
@@ -432,21 +432,21 @@
 			<!-- Selector de tema principal -->
 			<div>
 				<label for="temaPrincipal">Tema principal:</label>
-				<select id="temaPrincipal">
+					<select id="temaPrincipal" required>
 					<option value="">Primero selecciona una materia</option>
 				</select>
 			</div>
 			<!-- Selector de subtema -->
 			<div>
 				<label for="subtema">Subtema:</label>
-				<select id="subtema">
+					<select id="subtema" required>
 					<option value="">Primero selecciona un tema principal</option>
 				</select>
 			</div>
 			<!-- Selector de nivel de competencia y habilidad -->
 			<div>
 				<label for="nivelDificultad">Nivel de competencia:</label>
-				<select id="nivelDificultad">
+					<select id="nivelDificultad" required>
 					<option value="">Selecciona un nivel</option>
 					<option value="BÁSICO (Solo Nivel 1)">BÁSICO</option>
 					<option value="INTERMEDIO (Nivel 1 y Nivel 2)">INTERMEDIO</option>
@@ -456,7 +456,7 @@
 			<!-- Selector de tipo de actividad -->
 			<div>
 				<label for="tipoActividad">Tipo de actividad:</label>
-				<select id="tipoActividad">
+					<select id="tipoActividad" required>
 					<option value="">Selecciona una actividad</option>
 					<option value="glosarios extensos">Glosarios extensos</option>
 					<option value="resúmenes detallados">Resúmenes detallados</option>
@@ -487,7 +487,7 @@
 		</div>
 	</div>
 	<!-- Ventana modal flotante para mostrar el prompt generado -->
-	<div id="modalPrompt" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitulo">
+	<div id="modalPrompt" class="modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="modalTitulo" tabindex="-1">
 		<div class="modal-contenido">
 			<h2 id="modalTitulo" class="sr-only">Prompt generado</h2>
 			<!-- Botón para cerrar y volver al formulario -->
@@ -1768,18 +1768,115 @@ ${promptActividad}
 `;
 			}
 
+			function esActividadValida(tipoActividad) {
+				return Object.prototype.hasOwnProperty.call(GENERADORES_ACTIVIDAD, tipoActividad);
+			}
+
+			function esNivelValido(nivelDificultad) {
+				return [
+					"BÁSICO (Solo Nivel 1)",
+					"INTERMEDIO (Nivel 1 y Nivel 2)",
+					"AVANZADO (Todos los 3 Niveles)"
+				].includes(nivelDificultad);
+			}
+
+			function esMateriaValida(materia) {
+				return Object.prototype.hasOwnProperty.call(COMPETENCIAS_MATERIA, materia);
+			}
+
 			return {
-				generar
+				generar,
+				esActividadValida,
+				esNivelValido,
+				esMateriaValida
 			};
 		})();
 
 		// ==========================================================================
-		// 2. SERVICIO DE PERSISTENCIA (StorageService - Transacciones e IDs únicos)
+		// 2. VALIDACIÓN DEL DOMINIO
+		// ==========================================================================
+
+		const DomainValidator = (function () {
+			function tienePropiedad(objeto, propiedad) {
+				return Object.prototype.hasOwnProperty.call(objeto, propiedad);
+			}
+
+			function validarFormulario(datos) {
+				const errores = [];
+
+				if (!datos || typeof datos !== 'object') {
+					return { valido: false, errores: ['Los datos del formulario no son válidos.'] };
+				}
+
+				const { valorMateria, valorTemaPrincipal, valorSubtema, tipoActividad, nivelDificultad } = datos;
+
+				if (!valorMateria || !tienePropiedad(temas, valorMateria) || !PromptEngine.esMateriaValida(valorMateria)) {
+					errores.push('La materia seleccionada no es válida.');
+				}
+
+				const temasMateria = temas[valorMateria];
+				if (!valorTemaPrincipal || !temasMateria || !tienePropiedad(temasMateria, valorTemaPrincipal)) {
+					errores.push('El tema principal no pertenece a la materia seleccionada.');
+				}
+
+				const subtemasTema = temasMateria && temasMateria[valorTemaPrincipal];
+				if (!valorSubtema || !Array.isArray(subtemasTema) || !subtemasTema.includes(valorSubtema)) {
+					errores.push('El subtema no pertenece al tema principal seleccionado.');
+				}
+
+				if (!PromptEngine.esActividadValida(tipoActividad)) {
+					errores.push('El tipo de actividad seleccionado no es válido.');
+				}
+
+				if (!PromptEngine.esNivelValido(nivelDificultad)) {
+					errores.push('El nivel de dificultad seleccionado no es válido.');
+				}
+
+				return { valido: errores.length === 0, errores };
+			}
+
+			function validarRegistroPrompt(item) {
+				if (!item || typeof item !== 'object' || Array.isArray(item)) return false;
+
+				return ['prompt', 'materia', 'temaPrincipal', 'subtema', 'tipoActividad']
+					.every(campo => typeof item[campo] === 'string' && item[campo].trim() !== '');
+			}
+
+			function validarCatalogo(elementoMaterias) {
+				const materiasCatalogo = Object.keys(temas);
+				const materiasInterfaz = Array.from(elementoMaterias.options)
+					.map(opcion => opcion.value)
+					.filter(Boolean);
+				const faltantesEnInterfaz = materiasCatalogo.filter(materia => !materiasInterfaz.includes(materia));
+				const sobrantesEnInterfaz = materiasInterfaz.filter(materia => !materiasCatalogo.includes(materia));
+				const materiasSinCompetencias = materiasCatalogo.filter(materia => !PromptEngine.esMateriaValida(materia));
+
+				return {
+					valido: faltantesEnInterfaz.length === 0 && sobrantesEnInterfaz.length === 0 && materiasSinCompetencias.length === 0,
+					faltantesEnInterfaz,
+					sobrantesEnInterfaz,
+					materiasSinCompetencias
+				};
+			}
+
+			return {
+				validarFormulario,
+				validarRegistroPrompt,
+				validarCatalogo
+			};
+		})();
+
+		// ==========================================================================
+		// 3. SERVICIO DE PERSISTENCIA (StorageService - Esquema, migraciones e IDs)
 		// ==========================================================================
 
 		const StorageService = (function () {
 			const CLAVE_STORAGE = 'promptsGuardados';
+			const VERSION_STORAGE = 1;
+			const VERSION_PLANTILLA = 1;
+			const VERSION_CATALOGO = 1;
 			let cachePrompts = [];
+			let almacenamientoCorrupto = false;
 
 			function generarId() {
 				if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
@@ -1788,46 +1885,126 @@ ${promptActividad}
 				return 'prompt_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 9);
 			}
 
+			function copiarItem(item) {
+				return { ...item };
+			}
+
+			function serializar(items) {
+				return JSON.stringify({ version: VERSION_STORAGE, items });
+			}
+
+			function persistir(items) {
+				localStorage.setItem(CLAVE_STORAGE, serializar(items));
+			}
+
+			function normalizarItem(item, idsUsados) {
+				if (!DomainValidator.validarRegistroPrompt(item)) return null;
+
+				const idOriginal = typeof item.id === 'string' ? item.id.trim() : '';
+				const id = idOriginal && !idsUsados.has(idOriginal) ? idOriginal : generarId();
+				idsUsados.add(id);
+
+				return {
+					...item,
+					id,
+					fechaCreacion: typeof item.fechaCreacion === 'string' && item.fechaCreacion
+						? item.fechaCreacion
+						: new Date().toISOString(),
+					nivelDificultad: typeof item.nivelDificultad === 'string' ? item.nivelDificultad : null,
+					versionPlantilla: Number.isInteger(item.versionPlantilla) ? item.versionPlantilla : VERSION_PLANTILLA,
+					versionCatalogo: Number.isInteger(item.versionCatalogo) ? item.versionCatalogo : VERSION_CATALOGO
+				};
+			}
+
 			function cargar() {
+				almacenamientoCorrupto = false;
+
 				try {
 					const serializado = localStorage.getItem(CLAVE_STORAGE);
 					if (!serializado) {
 						cachePrompts = [];
-						return cachePrompts;
+						return { exito: true, migrado: false, advertencias: [] };
 					}
+
 					const parseado = JSON.parse(serializado);
-					if (!Array.isArray(parseado)) {
-						cachePrompts = [];
-						return cachePrompts;
+					const esFormatoAnterior = Array.isArray(parseado);
+					const itemsOriginales = esFormatoAnterior
+						? parseado
+						: parseado && parseado.version === VERSION_STORAGE && Array.isArray(parseado.items)
+							? parseado.items
+							: null;
+
+					if (!itemsOriginales) {
+						throw new Error('El formato almacenado no es compatible.');
 					}
-					// Migración automática de IDs para elementos existentes
-					cachePrompts = parseado.map(item => {
-						if (!item.id) {
-							return { ...item, id: generarId() };
+
+					const idsUsados = new Set();
+					const advertencias = [];
+					const itemsValidos = [];
+
+					itemsOriginales.forEach(item => {
+						const normalizado = normalizarItem(item, idsUsados);
+						if (normalizado) {
+							itemsValidos.push(normalizado);
+						} else {
+							advertencias.push('Se omitió un registro guardado con estructura inválida.');
 						}
-						return item;
 					});
-					return cachePrompts;
-				} catch (e) {
-					console.warn('Error al leer de localStorage:', e);
+
+					cachePrompts = itemsValidos;
+					const necesitaMigracion = esFormatoAnterior || itemsValidos.some((item, index) => {
+						const original = itemsOriginales[index];
+						return !original || original.id !== item.id
+							|| !Object.prototype.hasOwnProperty.call(original, 'nivelDificultad')
+							|| !Object.prototype.hasOwnProperty.call(original, 'versionPlantilla')
+							|| !Object.prototype.hasOwnProperty.call(original, 'versionCatalogo');
+					});
+
+					if (advertencias.length > 0) {
+						advertencias.push('Los datos originales no fueron sobrescritos automáticamente.');
+						almacenamientoCorrupto = true;
+					} else if (necesitaMigracion) {
+						persistir(cachePrompts);
+					}
+
+					return { exito: true, migrado: necesitaMigracion, advertencias };
+				} catch (error) {
+					console.warn('Error al leer de localStorage:', error);
 					cachePrompts = [];
-					return cachePrompts;
+					almacenamientoCorrupto = true;
+					return {
+						exito: false,
+						corrupto: true,
+						error: 'No se pudieron leer los prompts guardados porque el almacenamiento está dañado o tiene un formato incompatible.'
+					};
 				}
 			}
 
 			function guardar(promptData) {
-				const nuevoItem = {
+				if (!promptData || typeof promptData !== 'object') {
+					return { exito: false, error: 'Los datos del prompt no son válidos.' };
+				}
+
+				if (almacenamientoCorrupto) {
+					return { exito: false, error: 'No se puede guardar hasta resolver el problema del almacenamiento local.' };
+				}
+
+				const idsUsados = new Set(cachePrompts.map(item => item.id));
+				const nuevoItem = normalizarItem({
 					...promptData,
 					id: promptData.id || generarId(),
 					fechaCreacion: promptData.fechaCreacion || new Date().toISOString()
-				};
+				}, idsUsados);
 
-				// Clon inmutable para garantizar atomicidad ante errores de cuota
+				if (!nuevoItem) {
+					return { exito: false, error: 'Los datos del prompt no cumplen con la estructura requerida.' };
+				}
+
 				const nuevaLista = [...cachePrompts, nuevoItem];
 				try {
-					localStorage.setItem(CLAVE_STORAGE, JSON.stringify(nuevaLista));
+					persistir(nuevaLista);
 					cachePrompts = nuevaLista;
-					return { exito: true, item: nuevoItem };
+					return { exito: true, item: copiarItem(nuevoItem) };
 				} catch (error) {
 					console.error('Fallo al guardar en localStorage (posible cuota excedida):', error);
 					return { exito: false, error: 'No se pudo guardar el prompt en el almacenamiento local. Es posible que el almacenamiento esté lleno.' };
@@ -1835,9 +2012,18 @@ ${promptActividad}
 			}
 
 			function eliminarPorId(id) {
-				const nuevaLista = cachePrompts.filter(p => p.id !== id);
+				if (almacenamientoCorrupto) {
+					return { exito: false, error: 'No se puede eliminar hasta resolver el problema del almacenamiento local.' };
+				}
+
+				const existe = cachePrompts.some(item => item.id === id);
+				if (!existe) {
+					return { exito: false, error: 'El prompt seleccionado ya no existe.' };
+				}
+
+				const nuevaLista = cachePrompts.filter(item => item.id !== id);
 				try {
-					localStorage.setItem(CLAVE_STORAGE, JSON.stringify(nuevaLista));
+					persistir(nuevaLista);
 					cachePrompts = nuevaLista;
 					return { exito: true };
 				} catch (error) {
@@ -1850,6 +2036,7 @@ ${promptActividad}
 				try {
 					localStorage.removeItem(CLAVE_STORAGE);
 					cachePrompts = [];
+					almacenamientoCorrupto = false;
 					return { exito: true };
 				} catch (error) {
 					console.error('Error al limpiar localStorage:', error);
@@ -1858,14 +2045,16 @@ ${promptActividad}
 			}
 
 			function obtenerPorId(id) {
-				return cachePrompts.find(p => p.id === id) || null;
+				const item = cachePrompts.find(prompt => prompt.id === id);
+				return item ? copiarItem(item) : null;
 			}
 
 			function listarTodos() {
-				return [...cachePrompts];
+				return cachePrompts.map(copiarItem);
 			}
 
 			return {
+				CLAVE_STORAGE,
 				cargar,
 				guardar,
 				eliminarPorId,
@@ -1876,7 +2065,7 @@ ${promptActividad}
 		})();
 
 		// ==========================================================================
-		// 3. SERVICIO DE INTERFAZ Y DIÁLOGOS (UIService)
+		// 4. SERVICIO DE INTERFAZ Y DIÁLOGOS (UIService)
 		// ==========================================================================
 
 		const UIService = (function () {
@@ -1885,6 +2074,8 @@ ${promptActividad}
 				overlay.className = 'dialogo-overlay';
 				overlay.setAttribute('role', 'alertdialog');
 				overlay.setAttribute('aria-modal', 'true');
+				overlay.setAttribute('aria-label', 'Mensaje de error');
+				overlay.setAttribute('tabindex', '-1');
 
 				const caja = document.createElement('div');
 				caja.className = 'dialogo-caja dialogo-alerta';
@@ -1892,6 +2083,7 @@ ${promptActividad}
 
 				overlay.appendChild(caja);
 				document.body.appendChild(overlay);
+				overlay.focus();
 
 				const cerrar = () => {
 					overlay.remove();
@@ -1899,6 +2091,9 @@ ${promptActividad}
 
 				overlay.addEventListener('click', (e) => {
 					if (e.target === overlay) cerrar();
+				});
+				overlay.addEventListener('keydown', (e) => {
+					if (e.key === 'Escape') cerrar();
 				});
 
 				setTimeout(cerrar, 3500);
@@ -1909,6 +2104,8 @@ ${promptActividad}
 				overlay.className = 'dialogo-overlay';
 				overlay.setAttribute('role', 'dialog');
 				overlay.setAttribute('aria-modal', 'true');
+				overlay.setAttribute('aria-label', 'Confirmación');
+				overlay.setAttribute('tabindex', '-1');
 
 				const caja = document.createElement('div');
 				caja.className = 'dialogo-caja dialogo-confirmacion';
@@ -1933,6 +2130,7 @@ ${promptActividad}
 				caja.appendChild(acciones);
 				overlay.appendChild(caja);
 				document.body.appendChild(overlay);
+				btnCancelar.focus();
 
 				btnConfirmar.addEventListener('click', () => {
 					overlay.remove();
@@ -1945,6 +2143,10 @@ ${promptActividad}
 
 				overlay.addEventListener('click', (e) => {
 					if (e.target === overlay) overlay.remove();
+				});
+
+				overlay.addEventListener('keydown', (e) => {
+					if (e.key === 'Escape') overlay.remove();
 				});
 			}
 
@@ -1961,7 +2163,7 @@ ${promptActividad}
 		})();
 
 		// ==========================================================================
-		// 4. CONTROLADOR PRINCIPAL DE LA APLICACIÓN (AppController)
+		// 5. CONTROLADOR PRINCIPAL DE LA APLICACIÓN (AppController)
 		// ==========================================================================
 
 		document.addEventListener('DOMContentLoaded', function () {
@@ -1981,9 +2183,17 @@ ${promptActividad}
 				modalBotonEliminar: document.getElementById('modalBotonEliminar'),
 				borrarTodosPrompts: document.getElementById('borrarTodosPrompts')
 			};
+			const elementosFaltantes = Object.entries(elementos)
+				.filter(([, elemento]) => !elemento)
+				.map(([nombre]) => nombre);
+			if (elementosFaltantes.length > 0) {
+				console.error('No se encontraron elementos obligatorios de la interfaz:', elementosFaltantes);
+				return;
+			}
 
 			// Estado activo: ID inmutable del prompt en visualización
 			let promptActivoId = null;
+			let focoAnteriorModal = null;
 
 			function poblarSelect(elementoSelect, opciones, textoDefecto) {
 				elementoSelect.innerHTML = `<option value="">${textoDefecto}</option>`;
@@ -1993,6 +2203,54 @@ ${promptActividad}
 					elementoOpcion.textContent = opcion;
 					elementoSelect.appendChild(elementoOpcion);
 				});
+			}
+
+			function obtenerElementosEnfocables(contenedor) {
+				return Array.from(contenedor.querySelectorAll(
+					'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled])'
+				));
+			}
+
+			function abrirModal() {
+				focoAnteriorModal = document.activeElement;
+				elementos.modal.style.display = 'block';
+				elementos.modal.setAttribute('aria-hidden', 'false');
+				const primerElemento = obtenerElementosEnfocables(elementos.modal)[0];
+				(primerElemento || elementos.modal).focus();
+			}
+
+			function cerrarModal() {
+				elementos.modal.style.display = 'none';
+				elementos.modal.setAttribute('aria-hidden', 'true');
+				if (focoAnteriorModal && typeof focoAnteriorModal.focus === 'function') {
+					focoAnteriorModal.focus();
+				}
+				focoAnteriorModal = null;
+			}
+
+			function manejarTecladoModal(evento) {
+				if (evento.key === 'Escape') {
+					evento.preventDefault();
+					cerrarModal();
+					return;
+				}
+
+				if (evento.key !== 'Tab') return;
+				const enfocables = obtenerElementosEnfocables(elementos.modal);
+				if (enfocables.length === 0) {
+					evento.preventDefault();
+					return;
+				}
+
+				const primero = enfocables[0];
+				const ultimo = enfocables[enfocables.length - 1];
+				if (evento.shiftKey && document.activeElement === primero) {
+					evento.preventDefault();
+					ultimo.focus();
+				} else if (!evento.shiftKey && document.activeElement === ultimo) {
+					evento.preventDefault();
+					primero.focus();
+				}
 			}
 
 			function copiarAlPortapapeles() {
@@ -2052,6 +2310,14 @@ ${promptActividad}
 				});
 			}
 
+			function mostrarPrompt(prompt, id) {
+				promptActivoId = id || null;
+				elementos.modalResultado.textContent = prompt;
+				UIService.actualizarEnlaceChatGPT(elementos.modalBotonChatGPT, prompt);
+				elementos.modalBotonEliminar.disabled = !promptActivoId;
+				abrirModal();
+			}
+
 			function mostrarPromptGuardado(id) {
 				const item = StorageService.obtenerPorId(id);
 				if (!item) {
@@ -2060,11 +2326,7 @@ ${promptActividad}
 					return;
 				}
 
-				promptActivoId = item.id;
-				elementos.modalResultado.textContent = item.prompt;
-				UIService.actualizarEnlaceChatGPT(elementos.modalBotonChatGPT, item.prompt);
-				elementos.modalBotonEliminar.disabled = false;
-				elementos.modal.style.display = 'block';
+				mostrarPrompt(item.prompt, item.id);
 			}
 
 			// ============================
@@ -2101,36 +2363,36 @@ ${promptActividad}
 					nivelDificultad: elementos.nivelDificultad.value,
 				};
 
-				if (Object.values(datosFormulario).every(Boolean)) {
-					try {
-						const promptGenerado = PromptEngine.generar(datosFormulario);
-						const resultadoGuardado = StorageService.guardar({
-							prompt: promptGenerado,
-							materia: datosFormulario.valorMateria,
-							temaPrincipal: datosFormulario.valorTemaPrincipal,
-							subtema: datosFormulario.valorSubtema,
-							tipoActividad: datosFormulario.tipoActividad
-						});
+				const validacion = DomainValidator.validarFormulario(datosFormulario);
+				if (!validacion.valido) {
+					UIService.mostrarError(validacion.errores.join(' '));
+					return;
+				}
 
-						if (resultadoGuardado.exito) {
-							promptActivoId = resultadoGuardado.item.id;
-							actualizarListaPrompts();
-						} else {
-							promptActivoId = null;
-							UIService.mostrarError(resultadoGuardado.error);
-						}
+				try {
+					const promptGenerado = PromptEngine.generar(datosFormulario);
+					const resultadoGuardado = StorageService.guardar({
+						prompt: promptGenerado,
+						materia: datosFormulario.valorMateria,
+						temaPrincipal: datosFormulario.valorTemaPrincipal,
+						subtema: datosFormulario.valorSubtema,
+						tipoActividad: datosFormulario.tipoActividad,
+						nivelDificultad: datosFormulario.nivelDificultad
+					});
 
-						elementos.modalResultado.textContent = promptGenerado;
-						UIService.actualizarEnlaceChatGPT(elementos.modalBotonChatGPT, promptGenerado);
-						elementos.modalBotonCopiar.textContent = 'COPIAR PROMPT GENERADO';
-						elementos.modalBotonEliminar.disabled = !promptActivoId;
-						elementos.modal.style.display = 'block';
-					} catch (error) {
-						console.error('Error al generar el prompt:', error);
-						UIService.mostrarError('Ocurrió un error inesperado al generar el prompt.');
+					if (resultadoGuardado.exito) {
+						promptActivoId = resultadoGuardado.item.id;
+						actualizarListaPrompts();
+					} else {
+						promptActivoId = null;
+						UIService.mostrarError(resultadoGuardado.error);
 					}
-				} else {
-					UIService.mostrarError('Por favor, completa todos los campos.');
+
+					elementos.modalBotonCopiar.textContent = 'COPIAR PROMPT GENERADO';
+					mostrarPrompt(promptGenerado, promptActivoId);
+				} catch (error) {
+					console.error('Error al generar el prompt:', error);
+					UIService.mostrarError('Ocurrió un error inesperado al generar el prompt.');
 				}
 			});
 
@@ -2138,13 +2400,12 @@ ${promptActividad}
 			elementos.modalBotonCopiar.addEventListener('click', copiarAlPortapapeles);
 
 			// Cierre del modal
-			elementos.modalBotonCerrar.addEventListener('click', () => {
-				elementos.modal.style.display = 'none';
-			});
+			elementos.modalBotonCerrar.addEventListener('click', cerrarModal);
+			elementos.modal.addEventListener('keydown', manejarTecladoModal);
 
 			window.addEventListener('click', (evento) => {
 				if (evento.target === elementos.modal) {
-					elementos.modal.style.display = 'none';
+					cerrarModal();
 				}
 			});
 
@@ -2153,7 +2414,7 @@ ${promptActividad}
 				if (promptActivoId) {
 					const res = StorageService.eliminarPorId(promptActivoId);
 					if (res.exito) {
-						elementos.modal.style.display = 'none';
+						cerrarModal();
 						promptActivoId = null;
 						actualizarListaPrompts();
 					} else {
@@ -2174,10 +2435,36 @@ ${promptActividad}
 				});
 			});
 
+			window.addEventListener('storage', (evento) => {
+				if (evento.key !== StorageService.CLAVE_STORAGE) return;
+
+				const resultadoCarga = StorageService.cargar();
+				actualizarListaPrompts();
+
+				if (resultadoCarga.exito && promptActivoId && !StorageService.obtenerPorId(promptActivoId)) {
+					cerrarModal();
+					promptActivoId = null;
+					UIService.mostrarError('El prompt abierto fue eliminado en otra pestaña.');
+				} else if (!resultadoCarga.exito) {
+					UIService.mostrarError(resultadoCarga.error);
+				}
+			});
+
 			// ============================
 			// INICIALIZACIÓN
 			// ============================
-			StorageService.cargar();
+			elementos.modalBotonEliminar.disabled = true;
+			const resultadoCatalogo = DomainValidator.validarCatalogo(elementos.materia);
+			if (!resultadoCatalogo.valido) {
+				console.warn('El catálogo de la interfaz no coincide con el catálogo de dominio:', resultadoCatalogo);
+			}
+
+			const resultadoCarga = StorageService.cargar();
+			if (!resultadoCarga.exito) {
+				UIService.mostrarError(resultadoCarga.error);
+			} else if (resultadoCarga.advertencias.length > 0) {
+				console.warn('Advertencias al cargar prompts:', resultadoCarga.advertencias);
+			}
 			actualizarListaPrompts();
 		});
 	</script>
