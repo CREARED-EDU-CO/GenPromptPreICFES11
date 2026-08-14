@@ -65,7 +65,7 @@
 			font-family: var(--font-principal);
 			line-height: 1.6;
 			margin: 0;
-			padding: 15px;
+			padding: 0;
 			background-color: var(--color-fondo);
 			color: var(--color-texto);
 		}
@@ -75,14 +75,13 @@
    ============================ */
 
 		.contenedor {
-			width: 100%;
-			max-width: 100%;
-			margin: 0;
-			padding: 25px;
+			width: 80%;
+			max-width: 800px;
+			margin: auto;
+			padding: 20px;
 			background-color: var(--color-fondo);
 			border-radius: var(--radio-borde-grande);
-			box-shadow: none; /* Se quita la sombra para que se vea más natural dentro del iframe */
-			border: 1px solid var(--color-borde);
+			box-shadow: var(--sombra-caja);
 		}
 
 		/* ============================
@@ -163,7 +162,16 @@
 			background-color: var(--color-primario-hover);
 		}
 
+		/* Estilo para el botón de borrar todos los prompts */
+		.borrar-todos {
+			background-color: var(--color-peligro);
+			width: 100%;
+			margin-bottom: 10px;
+		}
 
+		.borrar-todos:hover {
+			background-color: var(--color-peligro-hover);
+		}
 
 		/* ============================
    Estilos de la ventana modal
@@ -191,7 +199,7 @@
 			padding: 20px;
 			border: 1px solid var(--color-borde);
 			width: 90%;
-			max-width: 90%;
+			max-width: 600px;
 			max-height: 80vh;
 			border-radius: var(--radio-borde-grande);
 			box-shadow: var(--sombra-modal);
@@ -199,17 +207,19 @@
 		}
 
 		/* Botones en la ventana modal */
-		.modal-boton-cerrar {
+		.modal-boton-cerrar,
+		.modal-boton-eliminar {
 			background-color: var(--color-peligro);
 			width: 100%;
 			margin: var(--espaciado-botones-modal) 0;
 		}
 
-		.modal-boton-cerrar:hover {
+		.modal-boton-cerrar:hover,
+		.modal-boton-eliminar:hover {
 			background-color: var(--color-peligro-hover);
 		}
 
-		/* Botón de IA (ChatGPT) */
+		/* Botones de IA (ChatGPT) */
 		.modal-boton-ia {
 			display: block;
 			margin: var(--espaciado-botones-modal) 0;
@@ -251,17 +261,134 @@
 			font-size: 1rem;
 		}
 
-
-
 		/* ============================
-   Responsiveness
+   Estilos para prompts guardados
    ============================ */
 
-		@media screen and (max-width: 800px) {
-			body {
-				padding: 10px;
+		#promptsGuardadosSeccion {
+			margin-top: 20px;
+			padding: 20px;
+			background-color: var(--color-fondo-seccion);
+			border-radius: var(--radio-borde-pequeno);
+		}
+
+		#promptsGuardadosSeccion h2 {
+			margin-top: 0;
+			color: var(--color-texto);
+		}
+
+		#listaPromptsGuardados {
+			list-style-type: none;
+			padding: 0;
+		}
+
+		#listaPromptsGuardados li {
+			background-color: var(--color-fondo);
+			margin-bottom: 10px;
+			padding: 10px;
+			border-radius: var(--radio-borde-pequeno);
+			cursor: pointer;
+			transition: var(--transicion-transformacion), background-color 0.2s ease;
+		}
+
+		#listaPromptsGuardados li:hover {
+			background-color: var(--color-fondo-hover);
+			transform: translateX(10px);
+		}
+
+		/* ============================
+		   Estilos para diálogos y alertas dinámicas
+		   ============================ */
+
+		.dialogo-overlay {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background-color: rgba(0, 0, 0, 0.5);
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			z-index: 1000;
+		}
+
+		.dialogo-caja {
+			background-color: var(--color-fondo);
+			padding: 20px;
+			border-radius: var(--radio-borde-pequeno);
+			box-shadow: var(--sombra-caja);
+			max-width: 90%;
+			width: 400px;
+			text-align: center;
+			color: var(--color-texto);
+			animation: aparecerDialogo 0.2s ease-out;
+		}
+
+		.dialogo-alerta {
+			border-left: 5px solid var(--color-peligro);
+			color: var(--color-peligro);
+			font-weight: 500;
+		}
+
+		.dialogo-confirmacion p {
+			margin-top: 0;
+			margin-bottom: 20px;
+			font-size: 1.05rem;
+		}
+
+		.dialogo-acciones {
+			display: flex;
+			justify-content: center;
+			gap: 10px;
+		}
+
+		.boton-confirmar {
+			background-color: #2e7d32;
+			color: #ffffff;
+			min-width: 100px;
+		}
+
+		.boton-confirmar:hover {
+			background-color: #1b5e20;
+		}
+
+		.boton-cancelar {
+			background-color: var(--color-peligro);
+			color: #ffffff;
+			min-width: 100px;
+		}
+
+		.boton-cancelar:hover {
+			background-color: var(--color-peligro-hover);
+		}
+
+		.modal-aviso-ia {
+			font-size: 0.85rem;
+			color: var(--color-texto-secundario);
+			margin-top: -5px;
+			margin-bottom: 10px;
+			text-align: center;
+		}
+
+		@keyframes aparecerDialogo {
+			from {
+				opacity: 0;
+				transform: scale(0.95);
 			}
+			to {
+				opacity: 1;
+				transform: scale(1);
+			}
+		}
+
+		/* ============================
+		   Responsiveness
+		   ============================ */
+
+		@media screen and (max-width: 800px) {
 			.contenedor {
+				width: 95%;
 				padding: 15px;
 			}
 
@@ -352,7 +479,12 @@
 			<!-- Botón para generar el prompt y abrir la ventana modal -->
 			<button type="submit">GENERAR PROMPT</button>
 		</form>
-
+		<!-- Sección para borrar y mostrar los prompts guardados -->
+		<div id="promptsGuardadosSeccion">
+			<h2>PROMPTS GUARDADOS:</h2>
+			<button id="borrarTodosPrompts" class="borrar-todos">BORRAR TODOS LOS PROMPTS GUARDADOS</button>
+			<ul id="listaPromptsGuardados"></ul>
+		</div>
 	</div>
 	<!-- Ventana modal flotante para mostrar el prompt generado -->
 	<div id="modalPrompt" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitulo">
@@ -365,7 +497,8 @@
 				CHATGPT</a>
 			<!-- Botón para copiar el prompt generado -->
 			<button id="modalBotonCopiar" class="modal-boton-ia">COPIAR PROMPT GENERADO</button>
-
+			<!-- Botón para eliminar prompt -->
+			<button id="modalBotonEliminar" class="modal-boton-eliminar">Borrar solo este prompt</button>
 			<!-- Texto con el prompt -->
 			<output id="modalResultado" aria-live="polite"></output>
 		</div>
@@ -1467,249 +1600,163 @@
 					'Reconocer el tono y registro básico'
 				]
 			}
-		}
+		};
 
 	</script>
 
 	<script>
+		// ==========================================================================
+		// 1. MOTOR DE PROMPTS (PromptEngine - Lógica de Dominio y Templating DRY)
+		// ==========================================================================
 
-		// Función para generar el prompt basado en los datos del formulario
-		function generarPrompt(datos) {
-			// Definición del prompt base con los datos generales
-			const promptBase = `Usted es el mejor docente, profesor y tutor experto en la materia de ${datos.valorMateria}. Su única tarea consiste en crear ${datos.tipoActividad} sobre el subtema de ${datos.valorSubtema}, dentro del tema general de ${datos.valorTemaPrincipal}. Este contenido debe estar dirigido a un estudiante de grado 11° de educación media o bachillerato en Colombia y con un nivel ${datos.nivelDificultad} de competencia y habilidad, quien se prepara para presentar el examen o prueba SABER 11 y necesita obtener en el resultado ICFES un alto puntaje en ${datos.valorMateria}.`;
-
-			let promptMateria = '';
-			let promptActividad = '';
-			let promptNivelDificultad = '';
-
-			// Generar prompt específico basado en la materia
-			switch (datos.valorMateria) {
-				case "LECTURA CRÍTICA":
-					promptMateria = `
+		const PromptEngine = (function () {
+			// Diccionario de competencias específicas por materia del ICFES
+			const COMPETENCIAS_MATERIA = {
+				'LECTURA CRÍTICA': `
 Nivel 1 - Identificar y entender los contenidos locales que conforman un texto: Esta competencia se enfoca en la comprensión del significado de palabras, expresiones y frases explícitas en el texto. Se busca entender las relaciones semánticas entre los elementos de una frase, respondiendo preguntas como "¿qué?", "¿dónde?", "¿cuándo?", "¿quién?", "¿de qué manera?" y "¿con quién?". Esta competencia es fundamental para el desarrollo de las siguientes dos.
 Nivel 2 - Comprender cómo se articulan las partes de un texto para darle un sentido global: Esta competencia evalúa la capacidad de entender cómo los elementos locales (frases, párrafos) se relacionan formal y semánticamente para dar un sentido global al texto. Implica usar el conocimiento previo para obtener conclusiones, plantear hipótesis, hacer generalizaciones, comprender el lenguaje figurado y predecir finales. Es necesaria para la siguiente competencia.
-Nivel 3 - Reflexionar a partir de un texto y evaluar su contenido: Esta competencia, la propiamente crítica, implica analizar el texto identificando la intención del autor, evaluando la validez de los argumentos, reconociendo estrategias argumentativas y retóricas, y relacionando el contenido con el contexto. Requiere un ejercicio adecuado de las dos competencias anteriores.`;
-					break;
-				case "MATEMÁTICAS":
-					promptMateria = `
+Nivel 3 - Reflexionar a partir de un texto y evaluar su contenido: Esta competencia, la propiamente crítica, implica analizar el texto identificando la intención del autor, evaluando la validez de los argumentos, reconociendo estrategias argumentativas y retóricas, y relacionando el contenido con el contexto. Requiere un ejercicio adecuado de las dos competencias anteriores.`,
+
+				'MATEMÁTICAS': `
 Nivel 1 - Interpretación y representación matemática: Esta competencia evalúa la capacidad de un estudiante para comprender información matemática presentada en varios formatos, como gráficos, tablas y diagramas. También evalúa su capacidad para convertir la información entre estos formatos y usarlos para identificar patrones y relaciones. Esta competencia es esencial para comprender el contexto de un problema y para comunicar información matemática de manera efectiva.
 Nivel 2 - Formulación y ejecución matemática: Esta competencia se basa en la capacidad de un estudiante para crear estrategias para resolver problemas matemáticos, ya sean puramente matemáticos o de la vida cotidiana. Esto implica seleccionar las herramientas matemáticas apropiadas, ejecutar los pasos de la solución y verificar si la respuesta tiene sentido. La competencia de formulación y ejecución requiere una comprensión profunda de los conceptos matemáticos y la capacidad de aplicarlos de manera flexible.
-Nivel 3 - Argumentación matemática: Esta competencia evalúa la capacidad de un estudiante para razonar matemáticamente y justificar sus soluciones, estrategias e interpretaciones. Esto puede implicar proporcionar ejemplos y contraejemplos, identificar errores en el razonamiento o explicar por qué una solución es válida. La argumentación es esencial para desarrollar un pensamiento matemático crítico y para comunicar ideas matemáticas de manera convincente.`;
-					break;
-				case "FÍSICA":
-					promptMateria = `
+Nivel 3 - Argumentación matemática: Esta competencia evalúa la capacidad de un estudiante para razonar matemáticamente y justificar sus soluciones, estrategias e interpretaciones. Esto puede implicar proporcionar ejemplos y contraejemplos, identificar errores en el razonamiento o explicar por qué una solución es válida. La argumentación es esencial para desarrollar un pensamiento matemático crítico y para comunicar ideas matemáticas de manera convincente.`,
+
+				'FÍSICA': `
 Nivel 1 - Explicación de fenómenos físicos: Esta competencia se centra en la capacidad de construir explicaciones científicas y comprender argumentos y modelos que expliquen fenómenos físicos.
 Nivel 2 - Uso comprensivo del conocimiento físico: Esta competencia se refiere a la capacidad de comprender y aplicar conceptos científicos de la física para resolver problemas. Se evalúa la capacidad de asociar fenómenos físicos con conceptos científicos y de identificar características de estos fenómenos a partir del análisis de información.
-Nivel 3 - Indagación científica en física: Esta competencia evalúa la capacidad de comprender cómo se construye el conocimiento científico en la física a través de la investigación. Esto implica analizar preguntas de investigación, reconocer la importancia de la evidencia, sacar conclusiones, observar patrones en los datos y evaluar predicciones.`;
-					break;
-				case "QUÍMICA":
-					promptMateria = `
+Nivel 3 - Indagación científica en física: Esta competencia evalúa la capacidad de comprender cómo se construye el conocimiento científico en la física a través de la investigación. Esto implica analizar preguntas de investigación, reconocer la importancia de la evidencia, sacar conclusiones, observar patrones en los datos y evaluar predicciones.`,
+
+				'QUÍMICA': `
 Nivel 1 - Explicación de fenómenos químicos: Esta competencia se centra en la capacidad de construir explicaciones científicas y comprender argumentos y modelos que expliquen fenómenos químicos.
 Nivel 2 - Uso comprensivo del conocimiento químico: Esta competencia se refiere a la capacidad de comprender y aplicar conceptos científicos de la química para resolver problemas. Se evalúa la capacidad de asociar fenómenos químicos con conceptos científicos y de identificar características de estos fenómenos a partir del análisis de información.
-Nivel 3 - Indagación científica en química: Esta competencia evalúa la capacidad de comprender cómo se construye el conocimiento científico en la química a través de la investigación. Esto implica analizar preguntas de investigación, reconocer la importancia de la evidencia, sacar conclusiones, observar patrones en los datos y evaluar predicciones.`;
-					break;
-				case "BIOLOGÍA":
-					promptMateria = `
+Nivel 3 - Indagación científica en química: Esta competencia evalúa la capacidad de comprender cómo se construye el conocimiento científico en la química a través de la investigación. Esto implica analizar preguntas de investigación, reconocer la importancia de la evidencia, sacar conclusiones, observar patrones en los datos y evaluar predicciones.`,
+
+				'BIOLOGÍA': `
 Nivel 1 - Explicación de fenómenos biológicos: Esta competencia se centra en la capacidad de construir explicaciones científicas y comprender argumentos y modelos que expliquen fenómenos biológicos.
 Nivel 2 - Uso comprensivo del conocimiento biológico: Esta competencia se refiere a la capacidad de comprender y aplicar conceptos científicos de la biología para resolver problemas. Se evalúa la capacidad de asociar fenómenos biológicos con conceptos científicos y de identificar características de estos fenómenos a partir del análisis de información.
-Nivel 3 - Indagación científica en biología: Esta competencia evalúa la capacidad de comprender cómo se construye el conocimiento científico en la biología a través de la investigación. Esto implica analizar preguntas de investigación, reconocer la importancia de la evidencia, sacar conclusiones, observar patrones en los datos y evaluar predicciones.`;
-					break;
-				case "GEOGRAFÍA":
-					promptMateria = `
-Nivel 1 - Pensamiento Geográfico: Evalúa la capacidad de usar conceptos básicos de geografía y entender el ordenamiento territorial. Las habilidades incluyen:
-- Identificar y usar conceptos geográficos: Analizar preguntas con conceptos geográficos básicos.
-- Identificar dimensiones espaciales: Comprender y analizar la relación entre eventos y contextos geográficos.
-Nivel 2 - Interpretación y Análisis de Perspectivas Geográficas: Evalúa la habilidad de analizar críticamente información geográfica y valorar diferentes opiniones y perspectivas. Las habilidades incluyen:
-- Reconocer opiniones e intereses geográficos: Analizar problemáticas geográficas desde diferentes perspectivas.
-- Análisis crítico de fuentes y argumentos geográficos: Valorar fuentes, corroborar información y evaluar argumentos geográficos.
-Nivel 3 - Pensamiento Reflexivo y Sistémico en Geografía: Evalúa la capacidad de entender las dimensiones de problemáticas geográficas y usar modelos conceptuales en decisiones geográficas. Las habilidades incluyen:
-- Identificar modelos conceptuales geográficos: Conocer y aplicar modelos conceptuales en decisiones.
-- Establecer relaciones entre dimensiones geográficas: Analizar efectos de intervenciones y relaciones entre ámbitos sociales, económicos, ambientales y políticos.`;
-					break;
-				case "HISTORIA":
-					promptMateria = `
-Nivel 1 - Pensamiento Histórico: Evalúa la capacidad de usar conceptos básicos de historia y entender el ordenamiento político. Las habilidades incluyen:
-- Identificar y usar conceptos históricos: Analizar preguntas con conceptos históricos básicos.
-- Identificar dimensiones temporales: Comprender y analizar la relación entre eventos históricos y sus contextos temporales.
-Nivel 2 - Interpretación y Análisis de Perspectivas Históricas: Evalúa la habilidad de analizar críticamente información histórica y valorar diferentes opiniones y perspectivas. Las habilidades incluyen:
-- Reconocer opiniones e intereses históricos: Analizar problemáticas históricas desde diferentes perspectivas.
-- Análisis crítico de fuentes y argumentos históricos: Valorar fuentes históricas, corroborar información y evaluar argumentos históricos.
-Nivel 3 - Pensamiento Reflexivo y Sistémico en Historia: Evalúa la capacidad de entender las dimensiones de problemáticas históricas y usar modelos conceptuales en decisiones históricas. Las habilidades incluyen:
-- Identificar modelos conceptuales históricos: Conocer y aplicar modelos conceptuales en decisiones históricas.
-- Establecer relaciones entre dimensiones históricas: Analizar efectos de intervenciones y relaciones entre ámbitos históricos, sociales, económicos, ambientales y políticos.`;
-					break;
-				case "COMPETENCIAS CIUDADANAS":
-					promptMateria = `
-Nivel 1 - Pensamiento Social: Evalúa la capacidad de usar conceptos básicos de las ciencias sociales y entender el ordenamiento político. Las habilidades incluyen:
-- Identificar y usar conceptos básicos de las ciencias sociales: Analizar preguntas utilizando conceptos básicos de las ciencias sociales, incluyendo conocimientos sobre la Constitución y mecanismos de participación ciudadana.
-- Identificar dimensiones temporales y espaciales de eventos y problemáticas sociales: Comprender y analizar la relación entre eventos y contextos sociales en sus dimensiones temporales y espaciales.
-Nivel 2 - Interpretación y Análisis de Perspectivas Ciudadanas: Evalúa la habilidad de analizar críticamente información sobre asuntos políticos, económicos y culturales, y valorar diferentes opiniones y perspectivas. Las habilidades incluyen:
-- Reconocer diversas opiniones, posturas e intereses: Analizar problemáticas sociales desde las perspectivas de diferentes actores sociales, comprendiendo el origen de los conflictos y los intereses de los involucrados.
-- Análisis crítico de fuentes y argumentos: Valorar fuentes primarias y secundarias, corroborar y contextualizar información, identificar prejuicios y establecer relaciones entre argumentos, evaluando la validez de generalizaciones y la confiabilidad de las fuentes.
-Nivel 3 - Pensamiento Reflexivo y Sistémico en Ciudadanía: Evalúa la capacidad de entender las dimensiones de problemáticas sociales y usar modelos conceptuales en la toma de decisiones sociales. Las habilidades incluyen:
-- Identificar modelos conceptuales que orientan decisiones sociales: Conocer y aplicar modelos conceptuales en contextos específicos, identificando sus características y principios para valorar decisiones en relación con sus objetivos o postulados.
-- Establecer relaciones entre dimensiones presentes en una situación problemática y sus posibles alternativas de solución: Analizar los efectos de intervenciones en la vida social, reconociendo las relaciones entre los ámbitos social, económico, ambiental y político, y comprendiendo cómo las decisiones pueden favorecer ciertas dimensiones e ir en detrimento de otras.`;
-					break;
-				case "INGLÉS":
-					promptMateria = `
-Nivel 1 - Conocimiento léxico y pragmático: Debe combinar la comprensión del vocabulario y la capacidad de interpretar el propósito y el contexto de avisos y anuncios. Los estudiantes deben relacionar descripciones con palabras y reconocer el propósito comunicativo de diferentes textos, determinando dónde podrían aparecer.
-Nivel 2 - Conocimiento comunicativo y gramatical: Se evalúa la capacidad de elegir la intervención adecuada en una conversación y la correcta aplicación de las reglas gramaticales en un texto. Los estudiantes deben seleccionar las respuestas más apropiadas en diálogos y completar textos con las palabras gramaticalmente correctas.
-Nivel 3 - Comprensión de lectura literal e inferencial, y conocimiento gramatical y léxico en contexto: Demuestra la capacidad de entender información explícita, deducir significados implícitos y seleccionar palabras que sean adecuadas tanto gramatical como léxicamente dentro del contexto de un texto. Esto incluye la comprensión de la intención del autor y la interpretación de diferentes figuras retóricas.`;
-					break;
-				default:
-					promptMateria = `Enfócate en los conceptos clave y habilidades específicas requeridas para esta área de estudio en el examen SABER 11.`;
-			}
+Nivel 3 - Indagación científica en biología: Esta competencia evalúa la capacidad de comprender cómo se construye el conocimiento científico en la biología a través de la investigación. Esto implica analizar preguntas de investigación, reconocer la importancia de la evidencia, sacar conclusiones, observar patrones en los datos y evaluar predicciones.`,
 
-			// Generar prompt específico basado en el tipo de actividad
-			switch (datos.tipoActividad) {
-				case "glosarios extensos":
-					promptActividad = `● Desarrolle su tarea siguiendo un proceso de razonamiento paso a paso y pensamiento autocrítico, asegurando la precisión académica en ${datos.valorMateria}.
-● Proporcione ${datos.tipoActividad} con un estilo expositivo, formal, detallado y extenso. Por ningún motivo elabore otro tipo de actividad.
-● Cumpla rigurosamente con los lineamientos de evaluación del ICFES SABER 11 para un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad.
-● Identifique todos los términos clave relacionados con ${datos.valorSubtema} en ${datos.valorTemaPrincipal}.
-● Asegúrese de incluir en los ${datos.tipoActividad} los términos clave que un alumno debe conocer para la prueba de ${datos.valorMateria} del examen SABER 11.
-● Proporcione definiciones claras y concisas para cada término del subtema de ${datos.valorSubtema} teniendo en cuenta que el alumno tiene un nivel ${datos.nivelDificultad} de competencia y habilidad.
-● Organice los términos en categorías lógicas dentro del tema de ${datos.valorTemaPrincipal}.`;
-					break;
+				'GEOGRAFÍA': `
+Nivel 1 - Pensamiento Geográfico: Evalúa la capacidad de usar conceptos básicos de geografía y entender el ordenamiento territorial.
+Nivel 2 - Interpretación y Análisis de Perspectivas Geográficas: Evalúa la habilidad de analizar críticamente información geográfica y valorar diferentes opiniones y perspectivas.
+Nivel 3 - Pensamiento Reflexivo y Sistémico en Geografía: Evalúa la capacidad de entender las dimensiones de problemáticas geográficas y usar modelos conceptuales en decisiones geográficas.`,
 
-				case "resúmenes detallados":
-					promptActividad = `● Desarrolle su tarea siguiendo un proceso de razonamiento paso a paso y pensamiento autocrítico, asegurando la precisión académica en ${datos.valorMateria}.
-● Proporcione ${datos.tipoActividad} con un estilo expositivo, formal, detallado y extenso. Por ningún motivo elabore otro tipo de actividad.
-● Cumpla rigurosamente con los lineamientos de evaluación del ICFES SABER 11 para un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad.
-● Identifique todos los conceptos principales que cubran los aspectos más relevantes del subtema de ${datos.valorSubtema} en ${datos.valorTemaPrincipal}.
-● Asegúrese de incluir en los ${datos.tipoActividad} los conceptos clave que debe conocer para la prueba de ${datos.valorMateria} del examen SABER 11.
-● Utilice frases cortas y precisas para explicar cada concepto de ${datos.valorSubtema}.
-● Destaque las relaciones entre diferentes conceptos para un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad.
-● Incluya cualquier fórmula, fecha o dato específico de ${datos.valorSubtema} que sea crucial para el examen SABER 11.`;
-					break;
+				'HISTORIA': `
+Nivel 1 - Pensamiento Histórico: Evalúa la capacidad de usar conceptos básicos de historia y entender el ordenamiento político.
+Nivel 2 - Interpretación y Análisis de Perspectivas Históricas: Evalúa la habilidad de analizar críticamente información histórica y valorar diferentes opiniones y perspectivas.
+Nivel 3 - Pensamiento Reflexivo y Sistémico en Historia: Evalúa la capacidad de entender las dimensiones de problemáticas históricas y usar modelos conceptuales en decisiones históricas.`,
 
-				case "tablas detalladas":
-					promptActividad = `● Desarrolle su tarea siguiendo un proceso de razonamiento paso a paso y pensamiento autocrítico, asegurando la precisión académica en ${datos.valorMateria}.
-● Proporcione ${datos.tipoActividad} con un estilo expositivo, formal, detallado y extenso. Por ningún motivo elabore otro tipo de actividad.
-● Cumpla rigurosamente con los lineamientos de evaluación del ICFES SABER 11 para un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad.
-● Identifique todos los conceptos principales que cubran los aspectos más relevantes del subtema de ${datos.valorSubtema} en ${datos.valorTemaPrincipal}.
-● Asegúrese de incluir los conceptos clave que debe conocer para la prueba de ${datos.valorMateria} del examen SABER 11.
-● Organice las ${datos.tipoActividad} con la información de ${datos.valorSubtema} en filas y columnas lógicas, usando encabezados claros.
-● Destaque las relaciones entre diferentes conceptos para un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad.
-● Incluya cualquier fórmula, fecha o dato específico de ${datos.valorSubtema} que sea crucial para el examen SABER 11.`;
-					break;
+				'COMPETENCIAS CIUDADANAS': `
+Nivel 1 - Pensamiento Social: Evalúa la capacidad de usar conceptos básicos de las ciencias sociales, Constitución y mecanismos de participación ciudadana.
+Nivel 2 - Interpretación y Análisis de Perspectivas Ciudadanas: Evalúa la habilidad de analizar problemáticas sociales identificando prejuicios, posturas e intereses de diferentes actores.
+Nivel 3 - Pensamiento Reflexivo y Sistémico en Ciudadanía: Evalúa la capacidad de analizar problemáticas multidimensionales (social, económico, ambiental y político) y evaluar el impacto de las decisiones.`,
 
-				case "ejemplos prácticos resueltos":
-					promptActividad = `● Desarrolle su tarea siguiendo un proceso de razonamiento paso a paso y pensamiento autocrítico, asegurando la precisión académica en ${datos.valorMateria}.
-● Proporcione ${datos.tipoActividad} con un estilo expositivo, formal, detallado y extenso. Por ningún motivo elabore otro tipo de actividad.
-● Cumpla rigurosamente con los lineamientos de evaluación del ICFES SABER 11 para un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad.
-● Cree dos ${datos.tipoActividad} que reflejen situaciones realistas o problemas típicos relacionados con ${datos.valorSubtema} en el ámbito de ${datos.valorTemaPrincipal}.
-● Proporcione una solución paso a paso para cada ejemplo o ejercicio, utilizando el lenguaje y metodología propios de la materia de ${datos.valorMateria}.
-● Explique el razonamiento detrás de cada paso de la solución para un alumno de nivel ${datos.nivelDificultad} de competencia y habilidad.
-● Conecte cada paso con los conceptos teóricos relevantes de ${datos.valorTemaPrincipal}.
-● Incluya variaciones del problema para mostrar diferentes aplicaciones del mismo concepto relacionados con la materia de ${datos.valorMateria}.`;
-					break;
+				'INGLÉS': `
+Nivel 1 - Conocimiento léxico y pragmático: Comprensión de vocabulario, relación de avisos/anuncios con contextos y reconocimiento del propósito comunicativo.
+Nivel 2 - Conocimiento comunicativo y gramatical: Selección de respuestas apropiadas en diálogos y completado de textos con estructuras gramaticales correctas.
+Nivel 3 - Comprensión de lectura literal e inferencial, y conocimiento gramatical y léxico en contexto: Comprensión de ideas explícitas e implícitas, deducción del tono/propósito del autor y análisis contextual.`
+			};
 
-				case "analogías con comparaciones":
-					promptActividad = `● Desarrolle su tarea siguiendo un proceso de razonamiento paso a paso y pensamiento autocrítico, asegurando la precisión académica en ${datos.valorMateria}.
-● Proporcione ${datos.tipoActividad} con un estilo expositivo, formal, detallado y extenso. Por ningún motivo elabore otro tipo de actividad.
-● Cumpla rigurosamente con los lineamientos de evaluación del ICFES SABER 11 para un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad.
-● Identifique todos los conceptos clave de ${datos.valorSubtema} que puedan ser difíciles de entender en el contexto de ${datos.valorTemaPrincipal}.
-● Cree tres ${datos.tipoActividad} que relacionen estos conceptos con situaciones o objetos de la vida cotidiana que ayuden a entender mejor ${datos.valorSubtema}.
-● Explique detalladamente cómo cada parte de la analogía se relaciona con el concepto original de ${datos.valorTemaPrincipal}.
-● Destaque las similitudes y también las limitaciones de cada analogía para un alumno con nivel ${datos.nivelDificultad} de competencia y habilidad.
-● Proporcione ejemplos de cómo estas analogías pueden ayudar a resolver problemas típicos de la prueba de ${datos.valorMateria} en el examen SABER 11.`;
-					break;
+			// Directivas particulares de cada tipo de actividad (abstraídas para cumplir DRY)
+			const GENERADORES_ACTIVIDAD = {
+				'glosarios extensos': (d) => `● Identifique todos los términos clave relacionados con ${d.valorSubtema} en ${d.valorTemaPrincipal}.
+● Asegúrese de incluir en los ${d.tipoActividad} los términos clave que un alumno debe conocer para la prueba de ${d.valorMateria} del examen SABER 11.
+● Proporcione definiciones claras y concisas para cada término del subtema de ${d.valorSubtema} teniendo en cuenta que el alumno tiene un nivel ${d.nivelDificultad} de competencia y habilidad.
+● Organice los términos en categorías lógicas dentro del tema de ${d.valorTemaPrincipal}.`,
 
-				case "mapas conceptuales y diagramas mentales":
-					promptActividad = `● Desarrolle su tarea siguiendo un proceso de razonamiento paso a paso y pensamiento autocrítico, asegurando la precisión académica en ${datos.valorMateria}.
-● Proporcione ${datos.tipoActividad} con un estilo expositivo, formal, detallado y extenso. Por ningún motivo elabore otro tipo de actividad.
-● Cumpla rigurosamente con los lineamientos de evaluación del ICFES SABER 11 para un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad.
-● Identifique todos los conceptos principales y secundarios de ${datos.valorSubtema}.
-● Cree ${datos.tipoActividad} que muestre claramente las relaciones entre estos conceptos, utilizando la terminología específica de ${datos.valorTemaPrincipal}.
-● Use formas, colores o símbolos consistentes con la materia de ${datos.valorMateria} para representar diferentes tipos de información.
+				'resúmenes detallados': (d) => `● Identifique todos los conceptos principales que cubran los aspectos más relevantes del subtema de ${d.valorSubtema} en ${d.valorTemaPrincipal}.
+● Asegúrese de incluir en los ${d.tipoActividad} los conceptos clave que debe conocer para la prueba de ${d.valorMateria} del examen SABER 11.
+● Utilice frases cortas y precisas para explicar cada concepto de ${d.valorSubtema}.
+● Destaque las relaciones entre diferentes conceptos para un alumno con un nivel ${d.nivelDificultad} de competencia y habilidad.
+● Incluya cualquier fórmula, fecha o dato específico de ${d.valorSubtema} que sea crucial para el examen SABER 11.`,
+
+				'tablas detalladas': (d) => `● Identifique todos los conceptos principales que cubran los aspectos más relevantes del subtema de ${d.valorSubtema} en ${d.valorTemaPrincipal}.
+● Asegúrese de incluir los conceptos clave que debe conocer para la prueba de ${d.valorMateria} del examen SABER 11.
+● Organice las ${d.tipoActividad} con la información de ${d.valorSubtema} en filas y columnas lógicas, usando encabezados claros.
+● Destaque las relaciones entre diferentes conceptos para un alumno con un nivel ${d.nivelDificultad} de competencia y habilidad.
+● Incluya cualquier fórmula, fecha o dato específico de ${d.valorSubtema} que sea crucial para el examen SABER 11.`,
+
+				'ejemplos prácticos resueltos': (d) => `● Cree dos ${d.tipoActividad} que reflejen situaciones realistas o problemas típicos relacionados con ${d.valorSubtema} en el ámbito de ${d.valorTemaPrincipal}.
+● Proporcione una solución paso a paso para cada ejemplo o ejercicio, utilizando el lenguaje y metodología propios de la materia de ${d.valorMateria}.
+● Explique el razonamiento detrás de cada paso de la solución para un alumno de nivel ${d.nivelDificultad} de competencia y habilidad.
+● Conecte cada paso con los conceptos teóricos relevantes de ${d.valorTemaPrincipal}.
+● Incluya variaciones del problema para mostrar diferentes aplicaciones del mismo concepto relacionados con la materia de ${d.valorMateria}.`,
+
+				'analogías con comparaciones': (d) => `● Identifique todos los conceptos clave de ${d.valorSubtema} que puedan ser difíciles de entender en el contexto de ${d.valorTemaPrincipal}.
+● Cree tres ${d.tipoActividad} que relacionen estos conceptos con situaciones o objetos de la vida cotidiana que ayuden a entender mejor ${d.valorSubtema}.
+● Explique detalladamente cómo cada parte de la analogía se relaciona con el concepto original de ${d.valorTemaPrincipal}.
+● Destaque las similitudes y también las limitaciones de cada analogía para un alumno con nivel ${d.nivelDificultad} de competencia y habilidad.
+● Proporcione ejemplos de cómo estas analogías pueden ayudar a resolver problemas típicos de la prueba de ${d.valorMateria} en el examen SABER 11.`,
+
+				'mapas conceptuales y diagramas mentales': (d) => `● Identifique todos los conceptos principales y secundarios de ${d.valorSubtema}.
+● Cree ${d.tipoActividad} que muestre claramente las relaciones entre estos conceptos, utilizando la terminología específica de ${d.valorTemaPrincipal}.
+● Use formas, colores o símbolos consistentes con la materia de ${d.valorMateria} para representar diferentes tipos de información.
 ● Incluya etiquetas claras y concisas para cada elemento del mapa o diagrama.
-● Proporcione una explicación detallada de cómo leer e interpretar el diagrama o mapa para un alumno con nivel ${datos.nivelDificultad} de competencia y habilidad.`;
-					break;
+● Proporcione una explicación detallada de cómo leer e interpretar el diagrama o mapa para un alumno con nivel ${d.nivelDificultad} de competencia y habilidad.`,
 
-				case "aplicaciones y usos en la vida real":
-					promptActividad = `● Desarrolle su tarea siguiendo un proceso de razonamiento paso a paso y pensamiento autocrítico, asegurando la precisión académica en ${datos.valorMateria}.
-● Proporcione ${datos.tipoActividad} con un estilo expositivo, formal, detallado y extenso. Por ningún motivo elabore otro tipo de actividad.
-● Cumpla rigurosamente con los lineamientos de evaluación del ICFES SABER 11 para un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad.
-● Identifique tres ${datos.tipoActividad} prácticos de ${datos.valorSubtema} en la vida cotidiana o en campos profesionales.
-● Para cada aplicación, explique claramente cómo se relaciona con los conceptos estudiados en ${datos.valorTemaPrincipal}.
-● Destaque cómo entender estas aplicaciones puede ayudar a resolver preguntas de un nivel ${datos.nivelDificultad} de competencia y habilidad en la prueba de ${datos.valorMateria} del examen SABER 11.
+				'aplicaciones y usos en la vida real': (d) => `● Identifique tres ${d.tipoActividad} prácticos de ${d.valorSubtema} en la vida cotidiana o en campos profesionales.
+● Para cada aplicación, explique claramente cómo se relaciona con los conceptos estudiados en ${d.valorTemaPrincipal}.
+● Destaque cómo entender estas aplicaciones puede ayudar a resolver preguntas de un nivel ${d.nivelDificultad} de competencia y habilidad en la prueba de ${d.valorMateria} del examen SABER 11.
 ● Incluya ejemplos de cómo estas aplicaciones han llevado a innovaciones o avances en diferentes campos.
-● Explique cómo estos ejemplos demuestran la relevancia de la materia de ${datos.valorMateria} en situaciones cotidianas.`;
-					break;
+● Explique cómo estos ejemplos demuestran la relevancia de la materia de ${d.valorMateria} en situaciones cotidianas.`,
 
-				case "juegos interactivos y actividades lúdicas":
-					promptActividad = `● Desarrolle su tarea siguiendo un proceso de razonamiento paso a paso y pensamiento autocrítico, asegurando la precisión académica en ${datos.valorMateria}.
-● Presente los ${datos.tipoActividad} con un estilo expositivo, formal, detallado y extenso. Por ningún motivo elabore otro tipo de actividad.
-● Cumpla rigurosamente con los lineamientos de evaluación del ICFES SABER 11 para un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad.
-● Cree un concepto de ${datos.tipoActividad} que se centre en los aspectos clave de ${datos.valorSubtema}.
-● Establezca reglas claras que fomenten el uso del conocimiento y las habilidades relevantes de ${datos.valorTemaPrincipal}.
-● Incluya elementos de desafío con un nivel ${datos.nivelDificultad} de competencia y habilidad, que motiven al alumno a mejorar su comprensión.
-● Asegúrese de que el juego cubra varios aspectos de subtema ${datos.valorSubtema}, similar a cómo se abordaría en la prueba de ${datos.valorMateria} de el examen SABER 11.
-● Proporcione una explicación de cómo cada elemento del juego se relaciona con los objetivos de aprendizaje.`;
-					break;
+				'juegos interactivos y actividades lúdicas': (d) => `● Cree un concepto de ${d.tipoActividad} que se centre en los aspectos clave de ${d.valorSubtema}.
+● Establezca reglas claras que fomenten el uso del conocimiento y las habilidades relevantes de ${d.valorTemaPrincipal}.
+● Incluya elementos de desafío con un nivel ${d.nivelDificultad} de competencia y habilidad, que motiven al alumno a mejorar su comprensión.
+● Asegúrese de que el juego cubra varios aspectos de subtema ${d.valorSubtema}, similar a cómo se abordaría en la prueba de ${d.valorMateria} de el examen SABER 11.
+● Proporcione una explicación de cómo cada elemento del juego se relaciona con los objetivos de aprendizaje.`,
 
-				case "preguntas de opción múltiple con respuestas":
-					promptActividad = `● Desarrolle su tarea siguiendo un proceso de razonamiento paso a paso y pensamiento autocrítico, asegurando la precisión académica en ${datos.valorMateria}.
-● Proporcione ${datos.tipoActividad} con un estilo expositivo, formal, detallado y extenso. Por ningún motivo elabore otro tipo de actividad.
-● Cumpla rigurosamente con los lineamientos de evaluación del ICFES SABER 11 para un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad.
-● Cree tres ${datos.tipoActividad} que cubran diferentes aspectos de ${datos.valorSubtema} dentro del tema de ${datos.valorTemaPrincipal}.
-● Asegúrese de que las preguntas reflejen el nivel ${datos.nivelDificultad} de competencia y habilidad del alumno y el formato de las preguntas específicas de ${datos.valorMateria} en el examen ICFES SABER 11.
+				'preguntas de opción múltiple con respuestas': (d) => `● Cree tres ${d.tipoActividad} que cubran diferentes aspectos de ${d.valorSubtema} dentro del tema de ${d.valorTemaPrincipal}.
+● Asegúrese de que las preguntas reflejen el nivel ${d.nivelDificultad} de competencia y habilidad del alumno y el formato de las preguntas específicas de ${d.valorMateria} en el examen ICFES SABER 11.
 ● Proporcione cuatro opciones de respuesta para cada pregunta que sean extensas en contenido y detalladas en información, requiriendo comprensión de lectura y análisis del tema, e incluyendo distractores plausibles.
 ● Indique la respuesta correcta para cada pregunta.
-● Piense paso a paso y de una explicación detallada y extensa de por qué la respuesta correcta es la adecuada y por qué las otras opciones son incorrectas.`;
-					break;
+● Piense paso a paso y de una explicación detallada y extensa de por qué la respuesta correcta es la adecuada y por qué las otras opciones son incorrectas.`,
 
-				case "preguntas de opción múltiple sin respuestas":
-					promptActividad = `● Desarrolle su tarea siguiendo un proceso de razonamiento paso a paso y pensamiento autocrítico, asegurando la precisión académica en ${datos.valorMateria}.
-● Proporcione ${datos.tipoActividad} con un estilo expositivo, formal, detallado y extenso. Por ningún motivo elabore otro tipo de actividad.
-● Cumpla rigurosamente con los lineamientos de evaluación del ICFES SABER 11 para un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad.
-● Cree cinco ${datos.tipoActividad} que cubran diferentes aspectos de ${datos.valorSubtema} dentro del tema de ${datos.valorTemaPrincipal}.
-● Asegúrese de que las preguntas reflejen el nivel ${datos.nivelDificultad} de competencia y habilidad del alumno y el formato de las preguntas específicas de ${datos.valorMateria} en el examen ICFES SABER 11.
+				'preguntas de opción múltiple sin respuestas': (d) => `● Cree cinco ${d.tipoActividad} que cubran diferentes aspectos de ${d.valorSubtema} dentro del tema de ${d.valorTemaPrincipal}.
+● Asegúrese de que las preguntas reflejen el nivel ${d.nivelDificultad} de competencia y habilidad del alumno y el formato de las preguntas específicas de ${d.valorMateria} en el examen ICFES SABER 11.
 ● Proporcione cuatro opciones de respuesta para cada pregunta que sean extensas en contenido y detalladas en información, requiriendo comprensión de lectura y análisis del tema, e incluyendo distractores plausibles.
 ● No indique cuál es la respuesta correcta.
-● Asegúrese de que cada pregunta tenga una única respuesta correcta y que sea posible llegar a ella utilizando el conocimiento esperado de un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad en ${datos.valorMateria}.`;
-					break;
+● Asegúrese de que cada pregunta tenga una única respuesta correcta y que sea posible llegar a ella utilizando el conocimiento esperado de un alumno con un nivel ${d.nivelDificultad} de competencia y habilidad en ${d.valorMateria}.`,
 
-				case "valoraciones y rúbricas de autoevaluación":
-					promptActividad = `● Desarrolle su tarea siguiendo un proceso de razonamiento paso a paso y pensamiento autocrítico, asegurando la precisión académica en ${datos.valorMateria}.
-● Proporcione ${datos.tipoActividad} con un estilo expositivo, formal, detallado y extenso. Por ningún motivo elabore otro tipo de actividad.
-● Cumpla rigurosamente con los lineamientos de evaluación del ICFES SABER 11 para un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad.
-● Identifique todas las competencias evaluadas en ${datos.valorMateria}, relacionadas con ${datos.valorSubtema} y que sean relevantes para un nivel ${datos.nivelDificultad} de competencia y habilidad.
-● Para cada competencia, cree ${datos.tipoActividad} para tres niveles de avance o progreso en ${datos.valorSubtema} (por ejemplo: en desarrollo, competente, finalizado).
-● Asegúrese de que las ${datos.tipoActividad} sean específicos, observables y medibles para el nivel ${datos.nivelDificultad} de competencia y habilidad en ${datos.valorMateria}.
+				'valoraciones y rúbricas de autoevaluación': (d) => `● Identifique todas las competencias evaluadas en ${d.valorMateria}, relacionadas con ${d.valorSubtema} y que sean relevantes para un nivel ${d.nivelDificultad} de competencia y habilidad.
+● Para cada competencia, cree ${d.tipoActividad} para tres niveles de avance o progreso en ${d.valorSubtema} (por ejemplo: en desarrollo, competente, finalizado).
+● Asegúrese de que las ${d.tipoActividad} sean específicos, observables y medibles para el nivel ${d.nivelDificultad} de competencia y habilidad en ${d.valorMateria}.
 ● Incluya una columna para que el alumno puedan anotar evidencias de su desempeño en cada criterio de autoevaluación.
-● Proporcione instrucciones claras sobre cómo usar la rúbrica y cómo interpretar los resultados para la materia de ${datos.valorMateria}.`;
-					break;
+● Proporcione instrucciones claras sobre cómo usar la rúbrica y cómo interpretar los resultados para la materia de ${d.valorMateria}.`
+			};
 
-				default:
-					promptActividad = `● Desarrolle su tarea siguiendo un proceso de razonamiento paso a paso y pensamiento autocrítico, asegurando la precisión académica en ${datos.valorMateria}.
+			function construirPromptNivel(datos) {
+				switch (datos.nivelDificultad) {
+					case "BÁSICO (Solo Nivel 1)":
+						return `Para este estudiante de nivel BÁSICO, enfócate solo en el primer nivel de competencia y habilidad (Nivel 1) evaluado por el ICFES SABER 11 para la prueba de ${datos.valorMateria}. Asegúrate de que el contenido sea accesible y fácil de entender, proporcionando explicaciones claras y sencillas por medio de ${datos.tipoActividad}. El objetivo es ayudar al estudiante a desarrollar la primer competencia y habilidad con una comprensión fundamental de los conceptos mínimos relacionados con ${datos.valorSubtema} en el tema de ${datos.valorTemaPrincipal}.`;
+					case "INTERMEDIO (Nivel 1 y Nivel 2)":
+						return `Para este estudiante de nivel INTERMEDIO, aborda solo los dos primeros niveles de competencias y habilidades (Niveles 1 y 2) evaluados por el ICFES SABER 11 para la prueba de ${datos.valorMateria}. El contenido debe introducir conceptos más complejos que el nivel básico, requiriendo un mayor nivel de análisis. Proporciona ${datos.tipoActividad} que muestren cómo se interrelacionan las dos primeras competencias y habilidades en el contexto de ${datos.valorSubtema} en el tema de ${datos.valorTemaPrincipal}.`;
+					case "AVANZADO (Todos los 3 Niveles)":
+						return `Para este estudiante de nivel AVANZADO, integra los tres niveles de competencias y habilidades (Niveles 1, 2 y 3) evaluados por el ICFES SABER 11 para la prueba de ${datos.valorMateria}. El contenido debe requerir de pensamiento crítico y análisis. Incluye ${datos.tipoActividad} que necesiten la aplicación simultánea de múltiples conceptos y de las tres competencias y habilidades, fomentando la capacidad del estudiante para hacer conexiones entre diferentes aspectos de ${datos.valorSubtema} en el tema de ${datos.valorTemaPrincipal} y su aplicación en situaciones del mundo real.`;
+					default:
+						return `Adapta el contenido al nivel de dificultad apropiado para un estudiante promedio de Grado 11° que se prepara para el examen SABER 11 en ${datos.valorMateria}.`;
+				}
+			}
+
+			function generar(datos) {
+				const promptBase = `Usted es el mejor docente, profesor y tutor experto en la materia de ${datos.valorMateria}. Su única tarea consiste en crear ${datos.tipoActividad} sobre el subtema de ${datos.valorSubtema}, dentro del tema general de ${datos.valorTemaPrincipal}. Este contenido debe estar dirigido a un estudiante de grado 11° de educación media o bachillerato en Colombia y con un nivel ${datos.nivelDificultad} de competencia y habilidad, quien se prepara para presentar el examen o prueba SABER 11 y necesita obtener en el resultado ICFES un alto puntaje en ${datos.valorMateria}.`;
+				const promptMateria = COMPETENCIAS_MATERIA[datos.valorMateria] || 'Enfócate en los conceptos clave y habilidades específicas requeridas para esta área de estudio en el examen SABER 11.';
+				const promptNivelDificultad = construirPromptNivel(datos);
+
+				// Preámbulo unificado (Principio DRY)
+				const preambuloComun = `● Desarrolle su tarea siguiendo un proceso de razonamiento paso a paso y pensamiento autocrítico, asegurando la precisión académica en ${datos.valorMateria}.
 ● Proporcione ${datos.tipoActividad} con un estilo expositivo, formal, detallado y extenso. Por ningún motivo elabore otro tipo de actividad.
-● Cumpla rigurosamente con los lineamientos de evaluación del ICFES SABER 11 para un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad.
-● Identifique todos los conceptos clave de ${datos.valorSubtema} que son relevantes para el examen SABER 11.
-● Cree contenido que aborde estos conceptos de manera clara y concisa.
-● Incluya ejemplos, explicaciones y ejercicios prácticos.
-● Asegúrese de que el contenido esté alineado con las tres competencias evaluadas en el examen ICFES SABER 11 para ${datos.valorMateria}.
-● Adapte el formato y el estilo del contenido para que sea atractivo y fácil de entender para un alumno en Grado 11° de Colombia con un nivel ${datos.nivelDificultad} de competencia.`;
-			}
+● Cumpla rigurosamente con los lineamientos de evaluación del ICFES SABER 11 para un alumno con un nivel ${datos.nivelDificultad} de competencia y habilidad.`;
 
-			// Generar prompt específico basado en el nivel de dificultad
-			switch (datos.nivelDificultad) {
-				case "BÁSICO (Solo Nivel 1)":
-					promptNivelDificultad = `Para este estudiante de nivel BÁSICO, enfócate solo en el primer nivel de competencia y habilidad (Nivel 1) evaluado por el ICFES SABER 11 para la prueba de ${datos.valorMateria}. Asegúrate de que el contenido sea accesible y fácil de entender, proporcionando explicaciones claras y sencillas por medio de ${datos.tipoActividad}. El objetivo es ayudar al estudiante a desarrollar la primer competencia y habilidad con una comprensión fundamental de los conceptos mínimos relacionados con ${datos.valorSubtema} en el tema de ${datos.valorTemaPrincipal}.`;
-					break;
-				case "INTERMEDIO (Nivel 1 y Nivel 2)":
-					promptNivelDificultad = `Para este estudiante de nivel INTERMEDIO, aborda solo los dos primeros niveles de competencias y habilidades (Niveles 1 y 2) evaluados por el ICFES SABER 11 para la prueba de ${datos.valorMateria}. El contenido debe introducir conceptos más complejos que el nivel básico, requiriendo un mayor nivel de análisis. Proporciona ${datos.tipoActividad} que muestren cómo se interrelacionan las dos primeras competencias y habilidades en el contexto de ${datos.valorSubtema} en el tema de ${datos.valorTemaPrincipal}.`;
-					break;
-				case "AVANZADO (Todos los 3 Niveles)":
-					promptNivelDificultad = `Para este estudiante de nivel AVANZADO, integra los tres niveles de competencias y habilidades (Niveles 1, 2 y 3) evaluados por el ICFES SABER 11 para la prueba de ${datos.valorMateria}. El contenido debe requerir de pensamiento crítico y análisis. Incluye ${datos.tipoActividad} que necesiten la aplicación simultánea de múltiples conceptos y de las tres competencias y habilidades, fomentando la capacidad del estudiante para hacer conexiones entre diferentes aspectos de ${datos.valorSubtema} en el tema de ${datos.valorTemaPrincipal} y su aplicación en situaciones del mundo real.`;
-					break;
-				default:
-					promptNivelDificultad = `Adapta el contenido al nivel de dificultad apropiado para un estudiante promedio de Grado 11° que se prepara para el examen SABER 11 en ${datos.valorMateria}.`;
-			}
+				const generadorEspecifico = GENERADORES_ACTIVIDAD[datos.tipoActividad];
+				const instruccionesEspecificas = generadorEspecifico
+					? generadorEspecifico(datos)
+					: `● Identifique todos los conceptos clave de ${datos.valorSubtema} que son relevantes para el examen SABER 11.\n● Cree contenido alineado con las tres competencias evaluadas en el examen ICFES SABER 11 para ${datos.valorMateria}.`;
 
-			// Retorna el prompt completo combinando todas las partes
-			return `${promptBase}
+				const promptActividad = `${preambuloComun}\n${instruccionesEspecificas}`;
+
+				return `${promptBase}
 
 Los lineamientos de evaluación del ICFES SABER 11 para las competencias y habilidades en la prueba de ${datos.valorMateria} son los siguientes tres niveles: ${promptMateria}
 
@@ -1719,18 +1766,205 @@ ${promptNivelDificultad}
 Su tarea, como experto en ${datos.valorMateria}, consiste en crear ${datos.tipoActividad}, considerando que el alumno tiene un nivel ${datos.nivelDificultad} de competencia y habilidad en ${datos.valorSubtema} dentro del tema de ${datos.valorTemaPrincipal}. Al hacer su tarea, es fundamental para el éxito del alumno que siga estrictamente las siguientes instrucciones específicas obligatorias:
 ${promptActividad}
 `;
-		}
+			}
 
-	</script>
+			return {
+				generar
+			};
+		})();
 
-	<script>
-		// Espera a que el DOM esté completamente cargado antes de ejecutar el script
+		// ==========================================================================
+		// 2. SERVICIO DE PERSISTENCIA (StorageService - Transacciones e IDs únicos)
+		// ==========================================================================
+
+		const StorageService = (function () {
+			const CLAVE_STORAGE = 'promptsGuardados';
+			let cachePrompts = [];
+
+			function generarId() {
+				if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+					return crypto.randomUUID();
+				}
+				return 'prompt_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 9);
+			}
+
+			function cargar() {
+				try {
+					const serializado = localStorage.getItem(CLAVE_STORAGE);
+					if (!serializado) {
+						cachePrompts = [];
+						return cachePrompts;
+					}
+					const parseado = JSON.parse(serializado);
+					if (!Array.isArray(parseado)) {
+						cachePrompts = [];
+						return cachePrompts;
+					}
+					// Migración automática de IDs para elementos existentes
+					cachePrompts = parseado.map(item => {
+						if (!item.id) {
+							return { ...item, id: generarId() };
+						}
+						return item;
+					});
+					return cachePrompts;
+				} catch (e) {
+					console.warn('Error al leer de localStorage:', e);
+					cachePrompts = [];
+					return cachePrompts;
+				}
+			}
+
+			function guardar(promptData) {
+				const nuevoItem = {
+					...promptData,
+					id: promptData.id || generarId(),
+					fechaCreacion: promptData.fechaCreacion || new Date().toISOString()
+				};
+
+				// Clon inmutable para garantizar atomicidad ante errores de cuota
+				const nuevaLista = [...cachePrompts, nuevoItem];
+				try {
+					localStorage.setItem(CLAVE_STORAGE, JSON.stringify(nuevaLista));
+					cachePrompts = nuevaLista;
+					return { exito: true, item: nuevoItem };
+				} catch (error) {
+					console.error('Fallo al guardar en localStorage (posible cuota excedida):', error);
+					return { exito: false, error: 'No se pudo guardar el prompt en el almacenamiento local. Es posible que el almacenamiento esté lleno.' };
+				}
+			}
+
+			function eliminarPorId(id) {
+				const nuevaLista = cachePrompts.filter(p => p.id !== id);
+				try {
+					localStorage.setItem(CLAVE_STORAGE, JSON.stringify(nuevaLista));
+					cachePrompts = nuevaLista;
+					return { exito: true };
+				} catch (error) {
+					console.error('Error al actualizar localStorage al eliminar:', error);
+					return { exito: false, error: 'No se pudo actualizar el almacenamiento local.' };
+				}
+			}
+
+			function borrarTodos() {
+				try {
+					localStorage.removeItem(CLAVE_STORAGE);
+					cachePrompts = [];
+					return { exito: true };
+				} catch (error) {
+					console.error('Error al limpiar localStorage:', error);
+					return { exito: false, error: 'No se pudo limpiar el almacenamiento local.' };
+				}
+			}
+
+			function obtenerPorId(id) {
+				return cachePrompts.find(p => p.id === id) || null;
+			}
+
+			function listarTodos() {
+				return [...cachePrompts];
+			}
+
+			return {
+				cargar,
+				guardar,
+				eliminarPorId,
+				borrarTodos,
+				obtenerPorId,
+				listarTodos
+			};
+		})();
+
+		// ==========================================================================
+		// 3. SERVICIO DE INTERFAZ Y DIÁLOGOS (UIService)
+		// ==========================================================================
+
+		const UIService = (function () {
+			function mostrarError(mensaje) {
+				const overlay = document.createElement('div');
+				overlay.className = 'dialogo-overlay';
+				overlay.setAttribute('role', 'alertdialog');
+				overlay.setAttribute('aria-modal', 'true');
+
+				const caja = document.createElement('div');
+				caja.className = 'dialogo-caja dialogo-alerta';
+				caja.textContent = mensaje;
+
+				overlay.appendChild(caja);
+				document.body.appendChild(overlay);
+
+				const cerrar = () => {
+					overlay.remove();
+				};
+
+				overlay.addEventListener('click', (e) => {
+					if (e.target === overlay) cerrar();
+				});
+
+				setTimeout(cerrar, 3500);
+			}
+
+			function mostrarConfirmacion(mensaje, onConfirm) {
+				const overlay = document.createElement('div');
+				overlay.className = 'dialogo-overlay';
+				overlay.setAttribute('role', 'dialog');
+				overlay.setAttribute('aria-modal', 'true');
+
+				const caja = document.createElement('div');
+				caja.className = 'dialogo-caja dialogo-confirmacion';
+
+				const texto = document.createElement('p');
+				texto.textContent = mensaje;
+
+				const acciones = document.createElement('div');
+				acciones.className = 'dialogo-acciones';
+
+				const btnConfirmar = document.createElement('button');
+				btnConfirmar.className = 'boton-confirmar';
+				btnConfirmar.textContent = 'Confirmar';
+
+				const btnCancelar = document.createElement('button');
+				btnCancelar.className = 'boton-cancelar';
+				btnCancelar.textContent = 'Cancelar';
+
+				acciones.appendChild(btnConfirmar);
+				acciones.appendChild(btnCancelar);
+				caja.appendChild(texto);
+				caja.appendChild(acciones);
+				overlay.appendChild(caja);
+				document.body.appendChild(overlay);
+
+				btnConfirmar.addEventListener('click', () => {
+					overlay.remove();
+					if (typeof onConfirm === 'function') onConfirm();
+				});
+
+				btnCancelar.addEventListener('click', () => {
+					overlay.remove();
+				});
+
+				overlay.addEventListener('click', (e) => {
+					if (e.target === overlay) overlay.remove();
+				});
+			}
+
+			function actualizarEnlaceChatGPT(elementoEnlace, prompt) {
+				if (!elementoEnlace) return;
+				elementoEnlace.href = `https://chatgpt.com/?prompt=${encodeURIComponent(prompt)}&hints=study`;
+			}
+
+			return {
+				mostrarError,
+				mostrarConfirmacion,
+				actualizarEnlaceChatGPT
+			};
+		})();
+
+		// ==========================================================================
+		// 4. CONTROLADOR PRINCIPAL DE LA APLICACIÓN (AppController)
+		// ==========================================================================
+
 		document.addEventListener('DOMContentLoaded', function () {
-			// ============================
-			// VARIABLES GLOBALES
-			// ============================
-
-			// Objeto para almacenar referencias a elementos del DOM
 			const elementos = {
 				materia: document.getElementById('materia'),
 				temaPrincipal: document.getElementById('temaPrincipal'),
@@ -1742,21 +1976,15 @@ ${promptActividad}
 				modalResultado: document.getElementById('modalResultado'),
 				modalBotonChatGPT: document.getElementById('modalBotonChatGPT'),
 				modalBotonCerrar: document.getElementById('modalBotonCerrar'),
-				modalBotonCopiar: document.getElementById('modalBotonCopiar')
+				modalBotonCopiar: document.getElementById('modalBotonCopiar'),
+				listaPromptsGuardados: document.getElementById('listaPromptsGuardados'),
+				modalBotonEliminar: document.getElementById('modalBotonEliminar'),
+				borrarTodosPrompts: document.getElementById('borrarTodosPrompts')
 			};
 
+			// Estado activo: ID inmutable del prompt en visualización
+			let promptActivoId = null;
 
-
-			// ============================
-			// FUNCIONES AUXILIARES
-			// ============================
-
-			/**
-			 * Llena un elemento select con opciones.
-			 * @param {HTMLSelectElement} elementoSelect - El elemento select a llenar.
-			 * @param {string[]} opciones - Array de opciones para el select.
-			 * @param {string} textoDefecto - Texto para la opción por defecto.
-			 */
 			function poblarSelect(elementoSelect, opciones, textoDefecto) {
 				elementoSelect.innerHTML = `<option value="">${textoDefecto}</option>`;
 				opciones.forEach(opcion => {
@@ -1767,153 +1995,102 @@ ${promptActividad}
 				});
 			}
 
-			/**
-			 * Muestra un mensaje de error en una ventana modal.
-			 * @param {string} mensaje - El mensaje de error a mostrar.
-			 */
-			function mostrarError(mensaje) {
-				const contenedorModal = document.createElement('div');
-				contenedorModal.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        `;
-
-				const divError = document.createElement('div');
-				divError.textContent = mensaje;
-				divError.style.cssText = `
-            background-color: #ffffff;
-            color: #ff0000;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            max-width: 80%;
-            text-align: center;
-        `;
-
-				contenedorModal.appendChild(divError);
-				document.body.appendChild(contenedorModal);
-
-				contenedorModal.addEventListener('click', function (evento) {
-					if (evento.target === contenedorModal) {
-						contenedorModal.remove();
-					}
-				});
-
-				setTimeout(() => {
-					contenedorModal.remove();
-				}, 3000);
-			}
-
-			/**
-			 * Actualiza el enlace del botón de IA con el prompt.
-			 * @param {string} prompt - El prompt a incluir en el enlace.
-			 */
-			function actualizarEnlacesIA(prompt) {
-				try {
-					// Validar que el elemento existe antes de actualizar
-					if (elementos.modalBotonChatGPT) {
-						elementos.modalBotonChatGPT.href = `https://chatgpt.com/?prompt=${encodeURIComponent(prompt)}&hints=study`;
-					} else {
-						console.warn('El botón de IA no está disponible en el DOM');
-					}
-				} catch (error) {
-					console.error('Error al actualizar el enlace de IA:', error);
-					// No lanzar el error para evitar bloquear la ejecución
-				}
-			}
-
-			/**
-			 * Copia el texto del prompt al portapapeles con fallback para iframes.
-			 */
 			function copiarAlPortapapeles() {
 				const texto = elementos.modalResultado.textContent;
 
-				// Intento 1: API Moderna (Navigator)
-				if (navigator.clipboard && window.isSecureContext) {
-					navigator.clipboard.writeText(texto).then(() => {
-						confirmarCopiado();
-					}).catch(err => {
-						console.warn('Fallo Clipboard API, intentando fallback...', err);
-						copiarFallback(texto);
-					});
-				} else {
-					// Intento 2: Método tradicional (Fallback)
-					copiarFallback(texto);
+				function confirmarCopiado() {
+					elementos.modalBotonCopiar.textContent = 'PROMPT COPIADO';
+					setTimeout(() => {
+						elementos.modalBotonCopiar.textContent = 'COPIAR PROMPT GENERADO';
+					}, 2000);
 				}
-			}
 
-			/**
-			 * Método de respaldo para entornos con restricciones de seguridad (iframes)
-			 */
-			function copiarFallback(texto) {
-				try {
+				function copiadoFallback(textoACopiar) {
 					const textArea = document.createElement("textarea");
-					textArea.value = texto;
-
-					// Aseguramos que no sea visible pero esté en el DOM
+					textArea.value = textoACopiar;
 					textArea.style.position = "fixed";
 					textArea.style.left = "-9999px";
 					textArea.style.top = "0";
 					document.body.appendChild(textArea);
-
-					textArea.focus();
-					textArea.select();
-
-					const exitoso = document.execCommand('copy');
-					document.body.removeChild(textArea);
-
-					if (exitoso) {
-						confirmarCopiado();
-					} else {
-						throw new Error('execCommand devolvió false');
+					try {
+						textArea.focus();
+						textArea.select();
+						const exito = document.execCommand('copy');
+						if (exito) {
+							confirmarCopiado();
+						} else {
+							throw new Error('execCommand falló');
+						}
+					} catch (err) {
+						console.error('Error en fallback de copia:', err);
+						UIService.mostrarError('No se pudo copiar automáticamente. Por favor, copia el texto manualmente.');
+					} finally {
+						if (textArea.parentNode) {
+							textArea.parentNode.removeChild(textArea);
+						}
 					}
-				} catch (err) {
-					console.error('Error en fallback de copiado:', err);
-					mostrarError('No se pudo copiar. Por favor, selecciona el texto y cópialo manualmente.');
+				}
+
+				if (navigator.clipboard && window.isSecureContext) {
+					navigator.clipboard.writeText(texto)
+						.then(confirmarCopiado)
+						.catch(() => copiadoFallback(texto));
+				} else {
+					copiadoFallback(texto);
 				}
 			}
 
-			/**
-			 * Actualiza visualmente el botón al copiar con éxito
-			 */
-			function confirmarCopiado() {
-				elementos.modalBotonCopiar.textContent = 'PROMPT COPIADO';
-				setTimeout(() => {
-					elementos.modalBotonCopiar.textContent = 'COPIAR PROMPT GENERADO';
-				}, 2000);
+			function actualizarListaPrompts() {
+				elementos.listaPromptsGuardados.innerHTML = '';
+				const lista = StorageService.listarTodos();
+
+				lista.forEach((item, index) => {
+					const li = document.createElement('li');
+					li.textContent = `${index + 1}. ${item.materia}: ${item.temaPrincipal} - ${item.subtema}. Actividad de ${item.tipoActividad}`;
+					li.addEventListener('click', () => mostrarPromptGuardado(item.id));
+					elementos.listaPromptsGuardados.appendChild(li);
+				});
 			}
 
+			function mostrarPromptGuardado(id) {
+				const item = StorageService.obtenerPorId(id);
+				if (!item) {
+					UIService.mostrarError('El prompt seleccionado ya no existe.');
+					actualizarListaPrompts();
+					return;
+				}
 
-
-
+				promptActivoId = item.id;
+				elementos.modalResultado.textContent = item.prompt;
+				UIService.actualizarEnlaceChatGPT(elementos.modalBotonChatGPT, item.prompt);
+				elementos.modalBotonEliminar.disabled = false;
+				elementos.modal.style.display = 'block';
+			}
 
 			// ============================
-			// EVENT LISTENERS
+			// CABLEADO DE EVENTOS
 			// ============================
 
-			// Evento para cambio en el selector de materia
+			// Cascada de selección de materias y temas
 			elementos.materia.addEventListener('change', function () {
 				const materiaSeleccionada = this.value;
-				poblarSelect(elementos.temaPrincipal, Object.keys(temas[materiaSeleccionada] || {}), 'Selecciona un tema principal');
+				const temasDisponibles = typeof temas !== 'undefined' && temas[materiaSeleccionada]
+					? Object.keys(temas[materiaSeleccionada])
+					: [];
+				poblarSelect(elementos.temaPrincipal, temasDisponibles, 'Selecciona un tema principal');
 				poblarSelect(elementos.subtema, [], 'Primero selecciona un tema principal');
 			});
 
-			// Evento para cambio en el selector de tema principal
 			elementos.temaPrincipal.addEventListener('change', function () {
 				const materiaSeleccionada = elementos.materia.value;
 				const temaSeleccionado = this.value;
-				poblarSelect(elementos.subtema, temas[materiaSeleccionada]?.[temaSeleccionado] || [], 'Selecciona un subtema');
+				const subtemasDisponibles = (typeof temas !== 'undefined' && temas[materiaSeleccionada]?.[temaSeleccionado])
+					? temas[materiaSeleccionada][temaSeleccionado]
+					: [];
+				poblarSelect(elementos.subtema, subtemasDisponibles, 'Selecciona un subtema');
 			});
 
-			// Evento para envío del formulario
+			// Envío del formulario y generación de prompts
 			elementos.formulario.addEventListener('submit', function (e) {
 				e.preventDefault();
 				const datosFormulario = {
@@ -1926,35 +2103,82 @@ ${promptActividad}
 
 				if (Object.values(datosFormulario).every(Boolean)) {
 					try {
-						const prompt = generarPrompt(datosFormulario);
-						elementos.modalResultado.textContent = prompt;
-						actualizarEnlacesIA(prompt);
+						const promptGenerado = PromptEngine.generar(datosFormulario);
+						const resultadoGuardado = StorageService.guardar({
+							prompt: promptGenerado,
+							materia: datosFormulario.valorMateria,
+							temaPrincipal: datosFormulario.valorTemaPrincipal,
+							subtema: datosFormulario.valorSubtema,
+							tipoActividad: datosFormulario.tipoActividad
+						});
+
+						if (resultadoGuardado.exito) {
+							promptActivoId = resultadoGuardado.item.id;
+							actualizarListaPrompts();
+						} else {
+							promptActivoId = null;
+							UIService.mostrarError(resultadoGuardado.error);
+						}
+
+						elementos.modalResultado.textContent = promptGenerado;
+						UIService.actualizarEnlaceChatGPT(elementos.modalBotonChatGPT, promptGenerado);
+						elementos.modalBotonCopiar.textContent = 'COPIAR PROMPT GENERADO';
+						elementos.modalBotonEliminar.disabled = !promptActivoId;
+						elementos.modal.style.display = 'block';
 					} catch (error) {
 						console.error('Error al generar el prompt:', error);
-						elementos.modalResultado.textContent = 'Ocurrió un error al generar el prompt. Por favor, revisa la consola para más detalles.';
+						UIService.mostrarError('Ocurrió un error inesperado al generar el prompt.');
 					}
-					elementos.modalBotonCopiar.textContent = 'COPIAR PROMPT GENERADO';
-					elementos.modal.style.display = 'block';
 				} else {
-					mostrarError('Por favor, completa todos los campos.');
+					UIService.mostrarError('Por favor, completa todos los campos.');
 				}
 			});
 
-			// Evento para copiar el prompt
+			// Botón de copiado
 			elementos.modalBotonCopiar.addEventListener('click', copiarAlPortapapeles);
 
-			// Los botones de IA ahora son enlaces <a> que se actualizan dinámicamente
-			// No necesitan event listeners adicionales
+			// Cierre del modal
+			elementos.modalBotonCerrar.addEventListener('click', () => {
+				elementos.modal.style.display = 'none';
+			});
 
-			// Evento para cerrar la ventana modal
-			elementos.modalBotonCerrar.onclick = () => elementos.modal.style.display = 'none';
-
-			// Evento para cerrar la ventana modal al hacer clic fuera de ella
 			window.addEventListener('click', (evento) => {
-				if (evento.target == elementos.modal) {
+				if (evento.target === elementos.modal) {
 					elementos.modal.style.display = 'none';
 				}
 			});
+
+			// Eliminación de un prompt individual por ID
+			elementos.modalBotonEliminar.addEventListener('click', () => {
+				if (promptActivoId) {
+					const res = StorageService.eliminarPorId(promptActivoId);
+					if (res.exito) {
+						elementos.modal.style.display = 'none';
+						promptActivoId = null;
+						actualizarListaPrompts();
+					} else {
+						UIService.mostrarError(res.error);
+					}
+				}
+			});
+
+			// Borrado total con confirmación
+			elementos.borrarTodosPrompts.addEventListener('click', function () {
+				UIService.mostrarConfirmacion('¿Estás seguro de que quieres borrar todos los prompts guardados?', () => {
+					const res = StorageService.borrarTodos();
+					if (res.exito) {
+						actualizarListaPrompts();
+					} else {
+						UIService.mostrarError(res.error);
+					}
+				});
+			});
+
+			// ============================
+			// INICIALIZACIÓN
+			// ============================
+			StorageService.cargar();
+			actualizarListaPrompts();
 		});
 	</script>
 </body>
