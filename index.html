@@ -191,19 +191,21 @@
 
 		.modal-contenido {
 			position: fixed;
-			top: 20px;
+			top: 50%;
 			left: 50%;
-			transform: translateX(-50%);
+			transform: translate(-50%, -50%);
 			background-color: var(--color-fondo);
 			margin: 0;
 			padding: 20px;
 			border: 1px solid var(--color-borde);
 			width: 90%;
 			max-width: 600px;
-			max-height: 80vh;
+			max-height: 85vh;
 			border-radius: var(--radio-borde-grande);
 			box-shadow: var(--sombra-modal);
-			overflow-y: auto;
+			display: flex;
+			flex-direction: column;
+			overflow: hidden;
 		}
 
 		/* Botones en la ventana modal */
@@ -211,7 +213,8 @@
 		.modal-boton-eliminar {
 			background-color: var(--color-peligro);
 			width: 100%;
-			margin: var(--espaciado-botones-modal) 0;
+			margin: 5px 0;
+			flex-shrink: 0;
 		}
 
 		.modal-boton-cerrar:hover,
@@ -222,7 +225,7 @@
 		/* Botones de IA (ChatGPT) */
 		.modal-boton-ia {
 			display: block;
-			margin: var(--espaciado-botones-modal) 0;
+			margin: 5px 0;
 			padding: 10px;
 			background-color: var(--color-primario);
 			color: var(--color-fondo);
@@ -236,6 +239,7 @@
 			transition: var(--transicion-rapida), var(--transicion-transformacion);
 			cursor: pointer;
 			box-sizing: border-box;
+			flex-shrink: 0;
 		}
 
 		.modal-boton-ia:hover {
@@ -249,9 +253,10 @@
 		/* Resultado en la ventana modal */
 		#modalResultado {
 			display: block;
-			margin: var(--espaciado-botones-modal) 0;
+			margin: 10px 0;
 			padding: 15px;
 			background-color: var(--color-fondo-seccion);
+			border: 1px solid var(--color-borde);
 			border-radius: var(--radio-borde-pequeno);
 			white-space: pre-wrap;
 			word-wrap: break-word;
@@ -259,6 +264,29 @@
 			color: var(--color-texto);
 			font-family: var(--font-principal);
 			font-size: 1rem;
+			max-height: 50vh;
+			overflow-y: auto;
+			flex: 1 1 auto;
+			box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+		}
+
+		/* Barra de desplazamiento personalizada para la caja del prompt */
+		#modalResultado::-webkit-scrollbar {
+			width: 8px;
+		}
+
+		#modalResultado::-webkit-scrollbar-track {
+			background: #e0e0e0;
+			border-radius: 4px;
+		}
+
+		#modalResultado::-webkit-scrollbar-thumb {
+			background: #a0a0a0;
+			border-radius: 4px;
+		}
+
+		#modalResultado::-webkit-scrollbar-thumb:hover {
+			background: #707070;
 		}
 
 		/* ============================
@@ -297,8 +325,8 @@
 		}
 
 		/* ============================
-		   Estilos para diálogos y alertas dinámicas
-		   ============================ */
+   Estilos para diálogos y alertas dinámicas
+   ============================ */
 
 		.dialogo-overlay {
 			position: fixed;
@@ -416,7 +444,7 @@
 				<p id="materiaDesc" class="campo-descripcion">Selecciona la materia para la cual deseas generar un
 					prompt.</p>
 				<label for="materia">Materia:</label>
-					<select id="materia" aria-describedby="materiaDesc" required>
+				<select id="materia" aria-describedby="materiaDesc" required>
 					<option value="">Selecciona una materia</option>
 					<option value="LECTURA CRÍTICA">LECTURA CRÍTICA</option>
 					<option value="MATEMÁTICAS">MATEMÁTICAS</option>
@@ -432,21 +460,21 @@
 			<!-- Selector de tema principal -->
 			<div>
 				<label for="temaPrincipal">Tema principal:</label>
-					<select id="temaPrincipal" required>
+				<select id="temaPrincipal" required>
 					<option value="">Primero selecciona una materia</option>
 				</select>
 			</div>
 			<!-- Selector de subtema -->
 			<div>
 				<label for="subtema">Subtema:</label>
-					<select id="subtema" required>
+				<select id="subtema" required>
 					<option value="">Primero selecciona un tema principal</option>
 				</select>
 			</div>
 			<!-- Selector de nivel de competencia y habilidad -->
 			<div>
 				<label for="nivelDificultad">Nivel de competencia:</label>
-					<select id="nivelDificultad" required>
+				<select id="nivelDificultad" required>
 					<option value="">Selecciona un nivel</option>
 					<option value="BÁSICO (Solo Nivel 1)">BÁSICO</option>
 					<option value="INTERMEDIO (Nivel 1 y Nivel 2)">INTERMEDIO</option>
@@ -486,6 +514,7 @@
 			<ul id="listaPromptsGuardados"></ul>
 		</div>
 	</div>
+	</main>
 	<!-- Ventana modal flotante para mostrar el prompt generado -->
 	<div id="modalPrompt" class="modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="modalTitulo" tabindex="-1">
 		<div class="modal-contenido">
@@ -497,10 +526,10 @@
 				CHATGPT</a>
 			<!-- Botón para copiar el prompt generado -->
 			<button id="modalBotonCopiar" class="modal-boton-ia">COPIAR PROMPT GENERADO</button>
-			<!-- Botón para eliminar prompt -->
-			<button id="modalBotonEliminar" class="modal-boton-eliminar">Borrar solo este prompt</button>
 			<!-- Texto con el prompt -->
 			<output id="modalResultado" aria-live="polite"></output>
+			<!-- Botón para eliminar prompt -->
+			<button id="modalBotonEliminar" class="modal-boton-eliminar">Borrar solo este prompt</button>
 		</div>
 	</div>
 	<!-- links a archivos javascript -->
